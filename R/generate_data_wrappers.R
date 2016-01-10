@@ -31,8 +31,51 @@ generate_data_binomial <- function(){
 
 generate_data_ar <- function(){
   set.seed(2222222)
+  data("normal_profiles", package="jadeSims")
+  p <- dim(normal_profiles)[1]
+  K <- dim(normal_profiles)[2]
+  for(arsd in c(0.5, 1, 2)){
+    for(rho in c(0, 0.2, 0.4)){
+      for(rep in 1:60){
+        file.prefix <- paste0("ar_sd", arsd, "_rho_", rho, "_n", rep)
+        data.file <- paste0("data/", file.prefix, "_data.RData")
+        y <- matrix(nrow=p, ncol=K)
+        full.data <- matrix(nrow=p, ncol=0)
+        for(i in 1:K){
+          my.y <- replicate(n=sample.size[i],
+                            expr=normal_data(normal_profiles[,i], arsd, rho, 0))
+          full.data <- cbind(full.data, my.y)
+        }
+        R <- list("Y"=full.data, "sample.size"=sample.size)
+        save(R, file=data.file)
+      }
+    }
+  }
 }
 
 generate_data_re <- function(){
   set.seed(3333333)
+  data("normal_profiles", package="jadeSims")
+  p <- dim(normal_profiles)[1]
+  K <- dim(normal_profiles)[2]
+
+  sds <- c(2.18,2.12,  2.06, 2)
+  res <- c(0.5, 0.707, .866, 1)
+  perc <- c(5, 10, 15, 20)
+  for(l in 1:4){
+    for(rep in 1:60){
+      file.prefix <- paste0("re_", perc, "_n", rep)
+      data.file <- paste0("data/", file.prefix, "_data.RData")
+      y <- matrix(nrow=p, ncol=K)
+      full.data <- matrix(nrow=p, ncol=0)
+      for(i in 1:K){
+        my.y <- replicate(n=sample.size[i],
+                      expr=normal_data(normal_profiles[,i], sds[l], 0, res[l]))
+        full.data <- cbind(full.data, my.y)
+      }
+      R <- list("Y"=full.data, "sample.size"=sample.size)
+      save(R, file=data.file)
+    }
+  }
 }
+
