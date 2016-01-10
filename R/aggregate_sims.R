@@ -31,7 +31,6 @@ aggregate_sims <- function(file.prefix, profiles, save.file=NULL,
 
   j <- 1
   for(rep in which.reps){
-    cat(file.prefix_n, "\n")
     jade.cv.file <- paste0("cv/", file.prefix , "_n", rep , "_cv.RData")
     orig.path.file <- paste0("path/", file.prefix, "_n", rep, "_path.0.RData")
     path.file.list <- paste0("path/", file.prefix, "_n", rep, "_path.", 1:5, ".RData")
