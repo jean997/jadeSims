@@ -74,7 +74,7 @@ Step 2: Run the alternative methods. These include  BSmooth, methylKit and splin
 
 ```{r, eval=FALSE}
 for(re in c(0, 0.02, 0.05, 0.07)){
-    for(rep in 1:1){
+    for(rep in 1:60){
       file.prefix <- paste0("binom_", re, "_n", rep)
       alternatives_binomial(file.prefix=file.prefix)
     }
@@ -87,4 +87,48 @@ Step 3: Run JADE: This can take a while so it is better to do it in parallel. Th
 ```{r, eval=FALSE}
 file.prefix <- "binom_0_n1"
 run_jade_binomial(file.prefix=file.prefix)
+```
+
+
+Step 4: Aggregate all the results into a  useful data structure. Use the `aggregate_binomial` function:
+
+```{r, eval=FALSE}
+aggregate_sims(file.prefix="binom_0", which.rep=1:60, profiles=binom_profiles, save.file="binom_0_agg.RData", tol=5e-3, level=0.1, run.cv=TRUE)
+```
+
+Step 5: Make Plots
+
+## Normal simulations with auto regressive errors and with random effects
+These simulations are produced using the same steps as above but with different functions.
+
+Step 1: Generate data. This process uses the `normal_data` function. There are wrappers producing the exact set of data used in the paper.
+```{r, eval=FALSE}
+generate_data_ar()
+generate_data_re()
+```
+
+Step 2: Run alternatives:
+
+For Auto-regressive errors
+```{r, eval=FALSE}
+for(arsd in c(0.5, 1, 2)){
+    for(rho in c(0, 0.2, 0.4)){
+      for(rep in 1:60){
+      file.prefix <- paste0("ar_sd", arsd, "_rho_", rho, "_n", rep)
+      alternatives_normal(file.prefix=file.prefix)
+    }
 }
+```
+
+For random effects:
+
+
+```{r, eval=FALSE}
+perc <- c(5, 10, 15, 20)
+for(l in 1:4){
+  for(rep in 1:60){
+    file.prefix <- paste0("re_", perc[l], "_n", rep)
+    alternatives_normal(file.prefix=file.prefix)
+  }
+}
+```
