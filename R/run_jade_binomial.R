@@ -10,7 +10,7 @@
 #'@param file.prefix File prefix
 #'@param run.f0 Run at gamma=0
 #'@param folds Which folds to calculate path for (0 is full data)
-#'@return A data frame with columns y and reads
+#'@return Nothing
 #'@export
 run_jade_binomial <- function( file.prefix, run.f0=TRUE, folds=0:5, log.gamma.min=-5){
 	fit0.file <- paste("f0/", file.prefix, "_f0.0.RData", sep="")
