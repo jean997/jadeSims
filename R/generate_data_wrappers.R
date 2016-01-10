@@ -8,7 +8,7 @@ generate_data_binomial <- function(){
   p <- dim(binom_profiles)[1]
   K <- dim(binom_profiles)[2]
   for(re in c(0, 0.02, 0.05, 0.07)){
-    for(rep in 1:1){
+    for(rep in 1:60){
       file.prefix <- paste0("binom_", re, "_n", rep)
       data.file <- paste0("data/", file.prefix, "_data.RData")
       full.counts <- matrix(nrow=p, ncol=0)
