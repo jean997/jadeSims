@@ -29,6 +29,7 @@ run_jade_normal <- function(file.prefix, run.f0=TRUE, folds=1:5, log.gamma.min=-
 	#Fit0 for folds and fit_var and path submit
 	for(j in folds){
 	  fit0.file <- paste0("f0/", file.prefix, "_f0.", j, ".RData")
+	  out.file <- paste0("path/", file.prefix, "_path.", j, ".RData")
 	  path <- jade_path(fit0=fit0.file, n.fits=100, out.file=out.file,
 	                    max.it=10000, tol=5e-3, adjust.rho.alpha=TRUE, log.gamma.min=log.gamma.min)
 	}
