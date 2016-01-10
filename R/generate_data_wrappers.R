@@ -29,8 +29,12 @@ generate_data_binomial <- function(){
   }
 }
 
+#'@title Wrapper to generate normal auto-regressive data
+#'@description Generate normal AR  data. Run form a directory with a "data/" subdirectory.
+#'@export
 generate_data_ar <- function(){
   set.seed(2222222)
+  sample.size=c(10, 10)
   data("normal_profiles", package="jadeSims")
   p <- dim(normal_profiles)[1]
   K <- dim(normal_profiles)[2]
@@ -53,8 +57,12 @@ generate_data_ar <- function(){
   }
 }
 
+#'@title Wrapper to generate normal data with random effects
+#'@description Generate normal data with random effects. Run form a directory with a "data/" subdirectory.
+#'@export
 generate_data_re <- function(){
   set.seed(3333333)
+  sample.size=c(10, 10)
   data("normal_profiles", package="jadeSims")
   p <- dim(normal_profiles)[1]
   K <- dim(normal_profiles)[2]
@@ -64,7 +72,7 @@ generate_data_re <- function(){
   perc <- c(5, 10, 15, 20)
   for(l in 1:4){
     for(rep in 1:60){
-      file.prefix <- paste0("re_", perc, "_n", rep)
+      file.prefix <- paste0("re_", perc[l], "_n", rep)
       data.file <- paste0("data/", file.prefix, "_data.RData")
       y <- matrix(nrow=p, ncol=K)
       full.data <- matrix(nrow=p, ncol=0)
