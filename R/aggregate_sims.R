@@ -18,9 +18,9 @@
 #' }
 #'@export
 aggregate_sims <- function(file.prefix, profiles, save.file=NULL,
-                                 which.rep=1:60, tol=5e-3, level=0.1,
+                                 which.reps=1:60, tol=5e-3, level=0.1,
                                  run.cv=TRUE){
-  n.sims <- length(which.rep)
+  n.sims <- length(which.reps)
   p <- dim(profiles)[1]
   K <- dim(profiles)[2]
   site.labels <- abs(profiles[,1]-profiles[,2]) > tol
