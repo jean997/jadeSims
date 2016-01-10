@@ -90,7 +90,7 @@ alternatives_binomial <- function(file.prefix, bs.factor=5, tmpdir="."){
   #Spline + T-Tests
   spline.Y <- apply(R$Y/R$READS, MARGIN=2, FUN=spline.func, sites=sites)
   #Weighted spline t-tests using resampling
-  spline.ttests <- fit.withttest(yhat, reads, sites, B=100, type="spline")
+  spline.ttests <- fit_withttest_binom(yhat, reads, sites, B=100, type="spline")
   #Regular t-tests
   spline.ind.ttests <- apply(spline.Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
 
@@ -98,7 +98,7 @@ alternatives_binomial <- function(file.prefix, bs.factor=5, tmpdir="."){
   #locfit.binom.func uses the same parameters as bsmooth
   locfit.binom.Y <-  apply(rbind(R$Y, R$READS), MARGIN=2,
                            FUN=locfit.binom.func, sites=round(sites*1e6, digits=0))
-  locfit.ttests <- fit.withttest(yhat, reads, sites, B=100, type="locfit")
+  locfit.ttests <- fit_withttest_binom(yhat, reads, sites, B=100, type="locfit")
   locfit.ind.ttests <- apply(locfit.binom.Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
 
 
@@ -122,7 +122,7 @@ alternatives_binomial <- function(file.prefix, bs.factor=5, tmpdir="."){
 #Utility functions for alternative methods
 
 #Weights t-test to reflect variability of fit resampling binomial
-fit.withttest <- function(phat, reads, sites, B=100, type=c("spline", "locfit")){
+fit_withttest_binom <- function(phat, reads, sites, B=100, type=c("spline", "locfit")){
   type <- match.arg(type)
   p <- dim(reads)[1]
   avg <- matrix(0, p , 2)
