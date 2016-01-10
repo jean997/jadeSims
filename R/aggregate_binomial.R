@@ -1,11 +1,3 @@
-#Aggregate results to produce ROC curves
-#Returns:
-#all.stat an array which is n.sims x 10 x p containing pvalues for each alternative method and fusion gamma for JADE for each site at each simulation
-#all.sep an array which is n.sims x p x gammas conaining 0 and 1 indicating separation at each gamma for each sim
-#changing all.sep to a list so different sims can have different gammas
-#Also return avg fpr and tpr for JADE at cross validated gamma and for alternative methods at q < 0.05 for fdr corrected values or p < 0.05/n.sims for non corrected pvalues
-
-#new.tol can be used to recalculate separation
 
 #'@title Aggregate binomial simulations
 #'@description Aggregate results of binomial simulations
