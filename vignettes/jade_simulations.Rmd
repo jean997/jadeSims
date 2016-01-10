@@ -1,0 +1,90 @@
+---
+title: "Reproducing JADE Simulations"
+author: "Jean"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title} 
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette walks throug the process of reproducing the simulation results presented in XXXXX.
+All of the files produced in the following steps are available in the supplemental material of that paper. 
+
+You will need the `bsseq` package and the `methylKit` package:
+```{r, eval=FALSE}
+#BSmooth
+source("https://bioconductor.org/biocLite.R")
+biocLite("bsseq")
+
+# methylKit dependencies
+install.packages( c("data.table","devtools"))
+source("http://bioconductor.org/biocLite.R")
+biocLite(c("GenomicRanges","IRanges"))
+
+# methylKit
+library(devtools)
+install_github("al2na/methylKit",build_vignettes=FALSE)
+```
+
+## Binomial simulations with random effects.
+These simulations are shown in secion XX. 
+The steps outlined below require a specific directory structure. These commands should all be run in a directory that contains the subdirectories `data/`, `f0/`, `path/`, `alt/`, and `cv/`.
+
+The mean curves shown in figure XX are in the `binom_profiles` object in this package.
+
+```{r, fig.show='hold', fig.width=6, fig.height=3, warning=FALSE}
+library(jadeSims)
+library(ggplot2)
+ggplot(data.frame(binom_profiles), aes(x=1:300)) +
+  geom_line(aes(y=X1)) + 
+  geom_line(aes(y=X2), color="blue") + 
+  labs(x="Position", y="Profile")
+```
+
+Step 1: Produce the data. 
+The function `tile_binomial_data` in this package produces data for a single group. The following produces one data set for both groups using a sample size of 10 in each group and no random effects.
+```{r}
+#One data set:
+sample.size <- c(10, 10)
+full.counts <- matrix(nrow=300, ncol=0)
+full.reads <- matrix(nrow=300, ncol=0)
+for(i in 1:2){
+  my.data <- replicate(n=sample.size[i], expr={
+      z <-  tile_binomial_data(profile=binom_profiles[,i], mean.reads=10,
+      reff.sd=0, mean.tile.length=30)
+      cbind(z$y, z$reads)})
+  my.counts <-  my.data[, 1, ]
+  my.reads <-  my.data[, 2, ]
+  full.counts <- cbind(full.counts, my.counts)
+  full.reads <- cbind(full.reads, my.reads)
+}
+R <- list("Y"=full.counts, "READS"=full.reads, "sample.size"=sample.size)
+```
+
+
+To produce the data sets used in the paper use the wrapper `generate_data_binomial` which includes the correct seed. This function must be used in a dirctory containing a `data/` subdirectory.
+
+```{r, eval=FALSE}
+generate_data_binomial()
+```
+
+Step 2: Run the alternative methods. These include  BSmooth, methylKit and spline and locfit t-test methods (not shown in the paper). The function `alternatives_binomial` runs these and saves results to a file in the `alt/` directory. To run for all the data created in the previous step:
+
+```{r, eval=FALSE}
+for(re in c(0, 0.02, 0.05, 0.07)){
+    for(rep in 1:1){
+      file.prefix <- paste0("binom_", re, "_n", rep)
+      alternatives_binomial(file.prefix=file.prefix)
+    }
+}
+```
+
+
+Step 3: Run JADE: This can take a while so it is better to do it in parallel. The function `run_jade_binomial` calculates the trendfiltering fits at `gamma=0` and runs the full path of solutions for the complete data as well as the cross validation data sets.
+
+```{r, eval=FALSE}
+file.prefix <- "binom_0_n1"
+run_jade_binomial(file.prefix=file.prefix)
+}
