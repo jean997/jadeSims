@@ -24,7 +24,7 @@ run_jade_normal <- function(file.prefix, run.f0=TRUE, folds=1:5, log.gamma.min=-
 	  save(f0, file=fit0.file)
 	  #Fit0 for folds
 	  cv_fit0(orig.fit=fit0.file, which.fold=1:5, n.folds=5,
-	          save.prefix = paste0("fit0/", file.prefix, "_f0"), return.objects=FALSE)
+	          save.prefix = paste0("f0/", file.prefix, "_f0"), return.objects=FALSE)
   }
 	#Fit0 for folds and fit_var and path submit
 	for(j in folds){
