@@ -24,7 +24,7 @@ alternatives_normal <- function(file.prefix){
 
 
   #No smoothing + T-test
-  ttests <- apply(R$Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
+  tt.pvals <- apply(R$Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
 
   #Spline + T-Tests
   spline.Y <- matrix(nrow=p, ncol=sum(R$sample.size))
@@ -32,36 +32,33 @@ alternatives_normal <- function(file.prefix){
     spline.Y[, strt[i]:stp[i]] <- apply(R$Y[, strt[i]:stp[i]], MARGIN=2,
                                         FUN=spline.func, sites=sites)
   }
-  spline.ttests <- apply(spline.Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
-
-  spline.nv.ttests <- fit_withttest(R$Y, R$sample.size, sites, B=100, type="spline")
+  spline.pvals <- apply(spline.Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
+  spline.wt.ttests <- fit_withttest(R$Y, R$sample.size, sites, B=100, type="spline")
 
   #Locfit + T-test
   locfit.Y <- matrix(nrow=p, ncol=sum(R$sample.size))
   for(i in 1:K){
-    locfit.Y[, strt[i]:stp[i]] <- apply(R$Y[, strt[i]:stp[i]], MARGIN=2, FUN=locfit.func, sites=sites)
+    locfit.Y[, strt[i]:stp[i]] <- apply(R$Y[, strt[i]:stp[i]], MARGIN=2,
+                                        FUN=locfit.func, sites=sites)
   }
-  locfit.ttests <- apply(locfit.Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
+  locfit.pvals <- apply(locfit.Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
+  locfit.wt.ttests <- fit_withttest(R$Y, R$sample.size, sites, B=100, type="locfit")
 
 
-  locfit.nv.ttests <- fit_withttest(R$Y, R$sample.size, sites, B=100, type="locfit")
+  #Adjust all pvalues using SLIM
+  tt.slim.pi0 <- SLIMfunc(tt.pvals)
+  tt.slim <- QValuesfun(tt.pvals, tt.slim.pi0$pi0_Est)
 
+  spline.tt.slim.pi0 <- SLIMfunc(spline.pvals)
+  spline.slim <- QValuesfun(spline.pvals, spline.tt.slim.pi0$pi0_Est)
 
-  #Adjust all pvalues using SLIM, BH
-  tt.slim.pi0 <- SLIMfunc(ttests)
-  tt.slim <- QValuesfun(ttests, tt.slim.pi0$pi0_Est)
-  tt.bh <- p.adjust(ttests, method="BH")
-
-  spline.tt.slim.pi0 <- SLIMfunc(spline.ttests)
-  spline.tt.slim <- QValuesfun(spline.ttests, spline.tt.slim.pi0$pi0_Est)
-  spline.tt.bh <- p.adjust(spline.ttests, method="BH")
-
-  locfit.tt.slim.pi0 <- SLIMfunc(locfit.ttests)
-  locfit.tt.slim <- QValuesfun(locfit.ttests, locfit.tt.slim.pi0$pi0_Est)
-  locfit.tt.bh <- p.adjust(locfit.ttests, method="BH")
+  locfit.tt.slim.pi0 <- SLIMfunc(locfit.pvals)
+  locfit.slim <- QValuesfun(locfit.pvals, locfit.tt.slim.pi0$pi0_Est)
 
   #Pvals
-  stats <- data.frame(ttests, tt.slim, tt.bh, spline.ttests, spline.tt.slim, spline.tt.bh, spline.nv.ttests, locfit.ttests, locfit.tt.slim, locfit.tt.bh, locfit.nv.ttests)
+  stats <- data.frame(tt.pvals, tt.slim,
+                      spline.pvals, spline.slim, spline.wt.ttests,
+                      locfit.pvals, locfit.slim, locfit.wt.ttests)
   save(stats, file=out.file)
 }
 

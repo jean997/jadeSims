@@ -30,7 +30,7 @@ plot_roc_curves <- function(agg.obj,
     fpr.list[[i]] <- tf$fpr
     tpr.list[[i]] <- tf$tpr
   }
-  avg_jade <- avg_by_interp(tpr.list=tpr.list, fpr.list=fpr.list, direction=direction, npoints=200)
+  avg_jade <- jadeSims:::avg_by_interp(tpr.list=tpr.list, fpr.list=fpr.list, direction=direction, npoints=200)
   plotCI(x=avg_jade$fpr[whichCI], y=avg_jade$tpr[whichCI], uiw=avg_jade$s.e[whichCI], err=err, ylim=c(0, 1), xlim=c(0, 1), pch=0, main=main, xlab="FPR", ylab="TPR", cex.lab=1.5, col=c, cex.main=2.5)
   lines(x=avg_jade$fpr, y=avg_jade$tpr, lwd=1.5, col=c)
   j <- which(agg.obj$names=="jade")
@@ -38,8 +38,7 @@ plot_roc_curves <- function(agg.obj,
   ct <- ct+1
 
 
-  stat.cols <- which(agg.obj$names %in% c("bss.tstat", "spline.ttests", " locfit.ttests",
-                                          "spline.nv.ttests", "locfit.nv.ttests"))
+  stat.cols <- which(agg.obj$names %in% c("bss.tstat", "spline.wt.ttests", " locfit.wt.ttests"))
 
   for(j in 1:(length(agg.obj$names)-1)){
     if(!(agg.obj$names[j] %in% which.stats)) next

@@ -67,6 +67,7 @@ alternatives_binomial <- function(file.prefix, bs.factor=5, tmpdir="."){
 
   mkit.pvals <- data.frame(agg.dmr$pvalue, agg.dmr$qvalue, ind.dmr$pvalue, ind.dmr$qvalue)
 
+  #MethylKit aggregated and individual, pvals and qvals
   names(mkit.pvals) <- c("mk.agg.pval", "mk.agg.qval", "mk.ind.pval", "mk.ind.qval")
   #4
 
@@ -86,33 +87,32 @@ alternatives_binomial <- function(file.prefix, bs.factor=5, tmpdir="."){
   #3
 
 
-
   #Spline + T-Tests
   spline.Y <- apply(R$Y/R$READS, MARGIN=2, FUN=spline.func, sites=sites)
-  #Weighted spline t-tests using resampling
-  spline.ttests <- fit_withttest_binom(yhat, reads, sites, B=100, type="spline")
+  #Weighted spline t-tests using resampling (stat only, no pvalue)
+  spline.wt.ttests <- fit_withttest_binom(yhat, reads, sites, B=100, type="spline")
   #Regular t-tests
-  spline.ind.ttests <- apply(spline.Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
+  spline.pvals <- apply(spline.Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
 
   #Locfit + T-test
   #locfit.binom.func uses the same parameters as bsmooth
   locfit.binom.Y <-  apply(rbind(R$Y, R$READS), MARGIN=2,
                            FUN=locfit.binom.func, sites=round(sites*1e6, digits=0))
-  locfit.ttests <- fit_withttest_binom(yhat, reads, sites, B=100, type="locfit")
-  locfit.ind.ttests <- apply(locfit.binom.Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
+  locfit.wt.ttests <- fit_withttest_binom(yhat, reads, sites, B=100, type="locfit")
+  locfit.pvals <- apply(locfit.binom.Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
 
 
   #Adjust all pvalues using SLIM, BH
 
-  spline.ind.tt.slim.pi0 <- SLIMfunc(spline.ind.ttests)
-  spline.ind.tt.slim <- QValuesfun(spline.ind.ttests, spline.ind.tt.slim.pi0$pi0_Est)
-  spline.ind.tt.bh <- p.adjust(spline.ind.ttests, method="BH")
+  spline.slim.pi0 <- SLIMfunc(spline.pvals)
+  spline.slim <- QValuesfun(spline.pvals, spline.slim.pi0$pi0_Est)
 
-  locfit.ind.tt.slim.pi0 <- SLIMfunc(locfit.ind.ttests)
-  locfit.ind.tt.slim <- QValuesfun(locfit.ind.ttests, locfit.ind.tt.slim.pi0$pi0_Est)
-  locfit.ind.tt.bh <- p.adjust(locfit.ind.ttests, method="BH")
+  locfit.slim.pi0 <- SLIMfunc(locfit.pvals)
+  locfit.slim <- QValuesfun(locfit.pvals, locfit.slim.pi0$pi0_Est)
 
-  my.ttests <- data.frame(spline.ttests, spline.ind.ttests, spline.ind.tt.slim, locfit.ttests, locfit.ind.ttests, locfit.ind.tt.slim)
+
+  my.ttests <- data.frame(spline.wt.ttests, spline.pvals, spline.slim,
+                          locfit.wt.ttests, locfit.pvals, locfit.slim)
   #6
   all.stats <- cbind(my.ttests, mkit.pvals, bsseq.stats)
   save(all.stats , file=out.file)

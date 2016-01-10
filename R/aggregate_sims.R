@@ -24,10 +24,8 @@ aggregate_sims <- function(file.prefix, profiles, save.file=NULL,
   p <- dim(profiles)[1]
   K <- dim(profiles)[2]
   site.labels <- abs(profiles[,1]-profiles[,2]) > tol
-  all.stats <- array(dim=c(n.sims, p, 13))
+
   all.sep <- list()
-  all.tpr <- matrix(nrow=n.sims, ncol=14)
-  all.fpr <- matrix(nrow=n.sims, ncol=14)
 
   j <- 1
   for(rep in which.reps){
@@ -39,22 +37,21 @@ aggregate_sims <- function(file.prefix, profiles, save.file=NULL,
 
     #Pvals for alternatives
     stats <- getobj(alt.file)
-    all.stats[j, , ] <- as.matrix(stats)
-
     if(j==1){
       pnames <- names(stats)
+      all.stats <- array(dim=c(n.sims, p, length(pnames)))
+      all.tpr <- all.fpr <- matrix(nrow=n.sims, ncol=length(pnames)+1)
     }
+    all.stats[j, , ] <- as.matrix(stats)
 
     #FPR and TPR
-    fdr.cols <- which(pnames %in% c("mk.agg.qval", "mk.ind.qval","bss.qval" ,
-                                    "spline.ind.tt.slim", "locfit.ind.tt.slim",
-                                    "tt.slim", "tt.bh", "spline.tt.slim", "spline.tt.bh",
-                                    "locfit.tt.slim", "locfit.tt.bh"))
+    fdr.cols <- which(pnames %in% c("mk.agg.qval", "mk.ind.qval",
+                                    "bss.qval" ,
+                                    "spline.slim", "locfit.slim",
+                                    "tt.slim"))
     p.cols <- which(pnames %in% c("mk.agg.pval", "mk.ind.pval", "bss.pval",
-                                  "spline.ind.ttests", "locfit.ind.ttests",
-                                  "ttests", "spline.ttests", "locfit.ttests"))
-    stat.cols <- which(pnames %in% c("bss.tstat", "spline.ttests", " locfit.ttests",
-                                     "spline.nv.ttests", "locfit.nv.ttests"))
+                                  "spline.pvals", "locfit.pvals", "tt.pvals"))
+    stat.cols <- which(pnames %in% c("bss.tstat", "spline.wt.ttests", " locfit.wt.ttests"))
 
     for(i in 1:length(pnames)){
       my.labs <- rep(0, p)
