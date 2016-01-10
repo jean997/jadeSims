@@ -6,7 +6,7 @@
 #'@return Nothing
 #'@export
 run_jade_normal <- function(file.prefix, run.f0=TRUE, folds=1:5, log.gamma.min=-5){
-	fit0.file <- paste0("fit0/", file.prefix, "_f0.0.RData")
+	fit0.file <- paste0("f0/", file.prefix, "_f0.0.RData")
 	data.file <- paste0("data/", file.prefix, "_data.RData")
 	R <- getobj(data.file)
   K <- length(R$sample.size)
