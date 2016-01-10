@@ -8,9 +8,11 @@
 #'@title Run JADE for one binomial simulation
 #'@description Run one binomial simulation with existing data
 #'@param file.prefix File prefix
+#'@param run.f0 Run at gamma=0
+#'@param folds Which folds to calculate path for (0 is full data)
 #'@return A data frame with columns y and reads
 #'@export
-run_jade_binomial <- function( file.prefix){
+run_jade_binomial <- function( file.prefix, run.f0=TRUE, folds=0:5){
 	fit0.file <- paste("f0/", file.prefix, "_f0.0.RData", sep="")
 	data.file <- paste("data/", file.prefix, "_data.RData", sep="")
 
@@ -30,13 +32,13 @@ run_jade_binomial <- function( file.prefix){
 		sds[,i] <- sqrt(yhat[,i]*(1-yhat[,i])/rowSums(my.reads))
 		strt <- strt + R$sample.size[i]
 	}
-	f0 <- jade_admm(y=y, sds=sds, gamma=0, lambda=NULL, sample.size=c(1,1), ord=2)
-	#Generate Data
-	save(f0, file=fit0.file)
-
-	#Fit0 for folds
-	cv_fit0(orig.fit=fit0.file, which.fold=1:5, n.fold=5, save.prefix=paste0("f0/", file.prefix, "_f0"), return.objects=FALSE)
-	for(j in 0:5){
+	if(run.f0){
+	  f0 <- jade_admm(y=y, sds=sds, gamma=0, lambda=NULL, sample.size=c(1,1), ord=2)
+	  save(f0, file=fit0.file)
+  	cv_fit0(orig.fit=fit0.file, which.fold=1:5, n.fold=5,
+  	        save.prefix=paste0("f0/", file.prefix, "_f0"), return.objects=FALSE)
+	}
+	for(j in folds){
 			#path
 			fit0.file <- paste0("f0/", file.prefix, "_f0.", j, ".RData")
 			out.file <- paste0("path/", file.prefix, "_path.", j, ".RData")
