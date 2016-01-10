@@ -20,7 +20,7 @@ run_jade_normal <- function(file.prefix, run.f0=TRUE, folds=1:5, log.gamma.min=-
 		strt <- strt + R$sample.size[i]
 	}
   if(run.f0){
-	  f0 <- jade_admm(y=y, gamma=0, lambda=lambda, sample.size=sample.size)
+	  f0 <- jade_admm(y=y, gamma=0, lambda=lambda, sample.size=R$sample.size)
 	  save(f0, file=fit0.file)
 	  #Fit0 for folds
 	  cv_fit0(orig.fit=fit0.file, which.fold=1:5, n.folds=5,
