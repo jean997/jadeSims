@@ -1,6 +1,6 @@
 
-#'@title Aggregate binomial simulations
-#'@description Aggregate results of binomial simulations
+#'@title Aggregate simulations
+#'@description Aggregate results of simulations
 #'@param file.prefix File prefix
 #'@param profiles Mean values
 #'@param save.file Optional output file
@@ -11,13 +11,13 @@
 #'@return A list with elements
 #'#' \describe{
 #'  \item{\code{names}}{Name of each method in order}
-#'  \item{\code{all.stats}}{B x n x 13 array of statistic values for alternative methods.}
+#'  \item{\code{all.stats}}{B x n x F array of statistic values for alternative methods.}
 #'   \item{\code{site.labels}}{Which sites are separated}
 #'   \item{\code{tol, level}}{Parameters passed in}
 #'   \item{\code{avg.tpr, avg.fpr}}{Average true and false positive rates at given level and for JADE (14th column)}
 #' }
 #'@export
-aggregate_binomial <- function(file.prefix, profiles, save.file=NULL,
+aggregate_sims <- function(file.prefix, profiles, save.file=NULL,
                                  which.rep=1:60, tol=5e-3, level=0.1,
                                  run.cv=TRUE){
   n.sims <- length(which.rep)
@@ -38,27 +38,6 @@ aggregate_binomial <- function(file.prefix, profiles, save.file=NULL,
     data.file <- paste0("data/", file.prefix, "_n", rep, "_data.RData")
     alt.file <- paste0("alt/", file.prefix, "_n", rep, "_altpvals.RData")
 
-    path <- getobj(orig.path.file)
-    #stopifnot(any(abs(path$gammas - gammas) > 1e-5))
-
-    #Separation
-
-    sep <- matrix(unlist(lapply(path$JADE_fits[-1], FUN=function(f, tol){
-      z <- get_sep(f$beta, tol=tol)
-      return(z[[1]][[1]])
-    }, tol=tol)), nrow=p)
-    sep <- cbind( get_sep(path$JADE_fits[[1]]$fits, tol), sep)
-    all.sep[[j]] <- sep
-
-    #Cross validation for JADE
-    if(run.cv){
-      cv.obj <- cv_err_wts(orig.path.file, path.file.list,
-                           use.converged.only=TRUE, control.l1=TRUE)
-      save(cv.obj, file=jade.cv.file)
-      all.tpr[j, 14] <- tpr.func(sep[, cv.obj$cv.1se.l1], site.labels)
-      all.fpr[j, 14] <- fpr.func(sep[, cv.obj$cv.1se.l1], site.labels)
-    }
-
     #Pvals for alternatives
     stats <- getobj(alt.file)
     all.stats[j, , ] <- as.matrix(stats)
@@ -68,10 +47,17 @@ aggregate_binomial <- function(file.prefix, profiles, save.file=NULL,
     }
 
     #FPR and TPR
-    fdr.cols <- which(pnames %in% c("mk.agg.qval", "mk.ind.qva","bss.qval" , "spline.ind.tt.slim", "locfit.ind.tt.slim"))
-    p.cols <- which(pnames %in% c("mk.agg.pval", "mk.ind.pval", "bss.pval", "spline.ind.ttests", "locfit.ind.ttests"))
-    stat.cols <- which(pnames %in% c("bss.tstat", "spline.ttests", " locfit.ttests"))
-    for(i in 1:13){
+    fdr.cols <- which(pnames %in% c("mk.agg.qval", "mk.ind.qval","bss.qval" ,
+                                    "spline.ind.tt.slim", "locfit.ind.tt.slim",
+                                    "tt.slim", "tt.bh", "spline.tt.slim", "spline.tt.bh",
+                                    "locfit.tt.slim", "locfit.tt.bh"))
+    p.cols <- which(pnames %in% c("mk.agg.pval", "mk.ind.pval", "bss.pval",
+                                  "spline.ind.ttests", "locfit.ind.ttests",
+                                  "ttests", "spline.ttests", "locfit.ttests"))
+    stat.cols <- which(pnames %in% c("bss.tstat", "spline.ttests", " locfit.ttests",
+                                     "spline.nv.ttests", "locfit.nv.ttests"))
+
+    for(i in 1:length(pnames)){
       my.labs <- rep(0, p)
       if(i %in% fdr.cols | i %in% p.cols){
         if(any(stats[,i] <=0)){
@@ -83,8 +69,29 @@ aggregate_binomial <- function(file.prefix, profiles, save.file=NULL,
       all.tpr[j, i] <- tpr.func(my.labs, site.labels)
       all.fpr[j, i] <- fpr.func(my.labs, site.labels)
     }
-    j=j+1
+
+
+    #JADE
+    path <- getobj(orig.path.file)
+
+    sep <- matrix(unlist(lapply(path$JADE_fits[-1], FUN=function(f, tol){
+      z <- get_sep(f$beta, tol=tol)
+      return(z[[1]][[1]])
+    }, tol=tol)), nrow=p)
+    sep <- cbind( get_sep(path$JADE_fits[[1]]$fits, tol), sep)
+    all.sep[[j]] <- sep
+
+    if(run.cv){
+      cv.obj <- cv_err_wts(orig.path.file, path.file.list,
+                         use.converged.only=TRUE, control.l1=TRUE)
+      save(cv.obj, file=jade.cv.file)
+      all.tpr[j, length(pnames)+1] <- tpr.func(sep[, cv.obj$cv.1se.l1], site.labels)
+      all.fpr[j, length(pnames)+1] <- fpr.func(sep[, cv.obj$cv.1se.l1], site.labels)
+    }
+    j <- j+1
   }
+
+
   avg.tpr <- colMeans(all.tpr, na.rm=TRUE)
   avg.fpr <- colMeans(all.fpr, na.rm=TRUE)
   names <- c(pnames, "jade")
