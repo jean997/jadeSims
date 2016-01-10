@@ -12,7 +12,7 @@
 #'@param folds Which folds to calculate path for (0 is full data)
 #'@return A data frame with columns y and reads
 #'@export
-run_jade_binomial <- function( file.prefix, run.f0=TRUE, folds=0:5){
+run_jade_binomial <- function( file.prefix, run.f0=TRUE, folds=0:5, log.gamma.min=-5){
 	fit0.file <- paste("f0/", file.prefix, "_f0.0.RData", sep="")
 	data.file <- paste("data/", file.prefix, "_data.RData", sep="")
 
@@ -44,7 +44,7 @@ run_jade_binomial <- function( file.prefix, run.f0=TRUE, folds=0:5){
 			out.file <- paste0("path/", file.prefix, "_path.", j, ".RData")
 			#Setting tol=5e-3 equal to that used in building the ROC curves ensures the most complete coverage
 			path <- jade_path(fit0=fit0.file, n.fits=100, out.file=out.file,
-			                  max.it=10000, tol=5e-3, adjust.rho.alpha=TRUE, log.gamma.min=-5)
+			                  max.it=10000, tol=5e-3, adjust.rho.alpha=TRUE, log.gamma.min=log.gamma.min)
 	}
 }
 
