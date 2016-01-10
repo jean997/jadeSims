@@ -81,9 +81,11 @@ aggregate_sims <- function(file.prefix, profiles, save.file=NULL,
       cv.obj <- cv_err_wts(orig.path.file, path.file.list,
                          use.converged.only=TRUE, control.l1=TRUE)
       save(cv.obj, file=jade.cv.file)
-      all.tpr[j, length(pnames)+1] <- tpr.func(sep[, cv.obj$cv.1se.l1], site.labels)
-      all.fpr[j, length(pnames)+1] <- fpr.func(sep[, cv.obj$cv.1se.l1], site.labels)
+    }else{
+      cv.obj <- getobj(jade.cv.file)
     }
+    all.tpr[j, length(pnames)+1] <- tpr.func(sep[, cv.obj$cv.1se.l1], site.labels)
+    all.fpr[j, length(pnames)+1] <- fpr.func(sep[, cv.obj$cv.1se.l1], site.labels)
     j <- j+1
   }
 
