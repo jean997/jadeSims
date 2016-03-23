@@ -4,7 +4,7 @@
 \alias{aggregate_sims}
 \title{Aggregate simulations}
 \usage{
-aggregate_sims(file.prefix, profiles, save.file = NULL, which.rep = 1:60,
+aggregate_sims(file.prefix, profiles, save.file = NULL, which.reps = 1:60,
   tol = 0.005, level = 0.1, run.cv = TRUE)
 }
 \arguments{
@@ -14,13 +14,13 @@ aggregate_sims(file.prefix, profiles, save.file = NULL, which.rep = 1:60,
 
 \item{save.file}{Optional output file}
 
-\item{which.rep}{Which simulations (length B)}
-
 \item{tol}{Threshold for declaring sites separated}
 
 \item{level}{Level at which to calcluate average true and false positive rate}
 
 \item{run.cv}{For JADE, calculate cv error if it hasn't been run already.}
+
+\item{which.rep}{Which simulations (length B)}
 }
 \value{
 A list with elements
