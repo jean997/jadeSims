@@ -69,12 +69,13 @@ aggregate_sims <- function(file.prefix, profiles, save.file=NULL,
 
     #JADE
     path <- getobj(orig.path.file)
-
+    u <- order(agg.obj$gammas[-1])
     sep <- matrix(unlist(lapply(path$JADE_fits[-1], FUN=function(f, tol){
       z <- get_sep(f$beta, tol=tol)
       return(z[[1]][[1]])
     }, tol=tol)), nrow=p)
-    sep <- cbind( get_sep(path$JADE_fits[[1]]$fits, tol), sep)
+    sep <- sep[,u]
+    sep <- cbind( unlist(get_sep(path$JADE_fits[[1]]$fits, tol)), sep)
     all.sep[[j]] <- sep
 
     if(run.cv){
