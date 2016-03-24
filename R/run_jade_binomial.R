@@ -4,6 +4,7 @@
 #'@import bsseq
 #'@import Matrix
 #'@import ROCR
+#'@import intervals
 
 #'@title Run JADE for one binomial simulation
 #'@description Run one binomial simulation with existing data

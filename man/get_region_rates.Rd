@@ -16,7 +16,7 @@ get_region_rates(agg.obj, stat.names, merge.margin = 0, min.length = 1,
 
 \item{min.length}{Only consider regions longer than min.length}
 
-\item{min.acc}{Not currently used}
+\item{min.acc}{Minimum accuract for a tp to count}
 }
 \value{
 A list of objects produced by get_tpr_fpr
