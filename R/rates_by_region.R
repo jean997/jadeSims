@@ -97,7 +97,7 @@ get_region_rates <- function(agg.obj,
   return(rate.list)
 }
 
-plot_rates <- function(rate.list){
+plot_rates <- function(rate.list, cols){
   plot(rate.list[[1]]$fpr, rate.list[[1]]$tpr, type="l",
        ylim=c(0, 1), xlim=c(0, 1), col=cols[1])
   for(i in 2:length(rate.list)){
