@@ -14,7 +14,13 @@ get_tpr_fpr <- function(sep, labels){
 		return(list("tpr"=tpr, "fpr"=fpr))
 }
 
-#For ROC curves 
+#For ROC curves
+#'@title Get average tpr and fpr rates over replicates
+#'@param tpr.list A list of vectors giving true positive rates
+#'@param fpr.list A list of vectors giving false positive rates
+#'@param direction Average over fixed fpr (vertical) or fixed tpr (horizontal)
+#'@return list with fpr, tpr and s.e
+#'@export
 avg_by_interp <- function(tpr.list, fpr.list, direction="vertical", npoints=200){
 	B <- length(tpr.list)
 	if(direction=="vertical"){
@@ -36,7 +42,7 @@ avg_by_interp <- function(tpr.list, fpr.list, direction="vertical", npoints=200)
 			fpr.mat[,i] <- apprx.tf$y
 		}
 		m <- rowMeans(fpr.mat, na.rm=TRUE)
-		tot.obs <- rowSums(!is.na(tpr.mat))
+		tot.obs <- rowSums(!is.na(fpr.mat))
 		var <- (1/(tot.obs-1))*rowSums((fpr.mat-m)^2, na.rm=TRUE)
 		return(list("fpr"=m, "tpr"=tpr.out, "s.e"=sqrt(var)))
 	}
