@@ -132,3 +132,11 @@ for(l in 1:4){
   }
 }
 ```
+
+
+Step 3: Run JADE
+
+```{r, eval=FALSE}
+file.prefix <-"ar_sd0.5_rho_0_n1"
+run_jade_normal(file.prefix=file.prefix)
+```

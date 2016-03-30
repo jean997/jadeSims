@@ -87,3 +87,29 @@ generate_data_re <- function(){
   }
 }
 
+
+
+#'@title Wrapper to generate normal auto-regressive data with long profiles
+#'@description Generate normal AR  data. Run form a directory with a "data/" subdirectory.
+#'@export
+generate_data_long <- function(arsd, rho, n.rep, sample.size=c(20, 20)){
+  set.seed(2222222)
+  sample.size=c(20, 20)
+  p <- dim(long_profiles)[1]
+  K <- dim(long_profiles)[2]
+
+  for(rep in 1:n.rep){
+    file.prefix <- paste0("ar_long_sd_", arsd, "_rho_", rho, "_n", rep)
+    data.file <- paste0("data/", file.prefix, "_data.RData")
+    y <- matrix(nrow=p, ncol=K)
+    full.data <- matrix(nrow=p, ncol=0)
+    for(i in 1:K){
+      my.y <- replicate(n=sample.size[i],
+                expr=normal_data(long_profiles[,i], arsd, rho, 0))
+      full.data <- cbind(full.data, my.y)
+    }
+    R <- list("Y"=full.data, "sample.size"=sample.size)
+    save(R, file=data.file)
+    alternatives_normal(file.prefix = file.prefix)
+  }
+}
