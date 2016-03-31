@@ -134,7 +134,7 @@ for(l in 1:4){
 ```
 
 
-Step 3: Run JADE
+Step 3: Run JADE - use the file prefixes defined above.
 
 ```{r, eval=FALSE}
 file.prefix <-"ar_sd0.5_rho_0_n1"
