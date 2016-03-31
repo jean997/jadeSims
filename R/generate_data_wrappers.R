@@ -95,8 +95,8 @@ generate_data_re <- function(){
 generate_data_long <- function(arsd, rho, n.rep, sample.size=c(20, 20)){
   set.seed(2222222)
   sample.size=c(20, 20)
-  p <- dim(long_profiles)[1]
-  K <- dim(long_profiles)[2]
+  p <- dim(long_profiles2)[1]
+  K <- dim(long_profiles2)[2]
 
   for(rep in 1:n.rep){
     file.prefix <- paste0("ar_long_sd_", arsd, "_rho_", rho, "_n", rep)
@@ -105,7 +105,7 @@ generate_data_long <- function(arsd, rho, n.rep, sample.size=c(20, 20)){
     full.data <- matrix(nrow=p, ncol=0)
     for(i in 1:K){
       my.y <- replicate(n=sample.size[i],
-                expr=normal_data(long_profiles[,i], arsd, rho, 0))
+                expr=normal_data(long_profiles2[,i], arsd, rho, 0))
       full.data <- cbind(full.data, my.y)
     }
     R <- list("Y"=full.data, "sample.size"=sample.size)
