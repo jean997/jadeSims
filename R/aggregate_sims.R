@@ -19,7 +19,7 @@
 #'@export
 aggregate_sims <- function(file.prefix, profiles, save.file=NULL,
                                  which.reps=1:60, tol=5e-3, level=0.1,
-                                 run.cv=TRUE){
+                                 run.cv=TRUE, clean.jade=FALSE){
   n.sims <- length(which.reps)
   p <- dim(profiles)[1]
   K <- dim(profiles)[2]
@@ -76,6 +76,10 @@ aggregate_sims <- function(file.prefix, profiles, save.file=NULL,
     }, tol=tol)), nrow=p)
     sep <- sep[,u]
     sep <- cbind( unlist(get_sep(path$JADE_fits[[1]]$fits, tol)), sep)
+    if(clean.jade){
+      sep.clean <- t( apply(sep, MARGIN=1, FUN=cummin))
+      sep <- sep.clean
+    }
     all.sep[[j]] <- sep
 
     if(run.cv){
