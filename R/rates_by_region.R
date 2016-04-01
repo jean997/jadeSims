@@ -48,10 +48,11 @@ rates_by_region <- function(x, labels,
 #'@return A list of objects produced by get_tpr_fpr
 #'@export
 get_region_rates <- function(agg.obj,
-                            stat.names,
+                            stat.names, avg.by.prop=FALSE, max.prop=0.5,
                              merge.margin=0, min.length=1, min.acc=0){
   #For each stat at each p-value level - p x length(which.stats) x 5
   #For jade at each level of gamma ngamma x 5
+
   labels <- agg.obj$site.labels
   N <- dim(agg.obj$all.stats)[1]
   r <- length(stat.names)
@@ -70,12 +71,15 @@ get_region_rates <- function(agg.obj,
     jade.rates <-apply(agg.obj$all.sep[[j]], MARGIN=2, FUN=function(x){
       unlist(rates_by_region(x, labels, merge.margin, min.length, min.acc))
     })
-    tpr.list[[j]] <- jade.rates["tpr",]
-    fpr.list[[j]] <- jade.rates["fpr",]
-    prop.list[[j]] <- jade.rates["tot.disc",]
+    midx <- which(jade.rates["tot.disc",] <= max.prop)
+    tpr.list[[j]] <- jade.rates["tpr", midx]
+    fpr.list[[j]] <- jade.rates["fpr",midx]
+    prop.list[[j]] <- jade.rates["tot.disc", midx]
   }
   cat("\n")
-  rate.list[[ct]] <- avg_by_prop(tpr.list, fpr.list, prop.list)
+  if(avg.by.prop) rate.list[[ct]] <- avg_by_prop(tpr.list, fpr.list, prop.list)
+    else rate.list[[ct]] <- avg_by_interp(tpr.list, fpr.list)
+
   ct <- ct + 1
 
   for(ix in which.stats){
@@ -92,11 +96,13 @@ get_region_rates <- function(agg.obj,
         x <- stats < t
         unlist(rates_by_region(x, labels, merge.margin, min.length, min.acc))
       }, stats=agg.obj$all.stats[j, , ix], sort.p=sort.p)
-      tpr.list[[j]] <- M["tpr",]
-      fpr.list[[j]] <- M["fpr",]
-      prop.list[[j]] <- M["tot.disc",]
+      midx <- which(M["tot.disc",] <= max.prop)
+      tpr.list[[j]] <- M["tpr", midx]
+      fpr.list[[j]] <- M["fpr",midx]
+      prop.list[[j]] <- M["tot.disc", midx]
     }
-    rate.list[[ct]] <- avg_by_prop(tpr.list, fpr.list, prop.list)
+    if(avg.by.prop) rate.list[[ct]] <- avg_by_prop(tpr.list, fpr.list, prop.list)
+      else if(avg.by.prop) rate.list[[ct]] <- avg_by_interp(tpr.list, fpr.list)
     ct <- ct + 1
     cat("\n")
   }
