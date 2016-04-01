@@ -102,7 +102,7 @@ get_region_rates <- function(agg.obj,
       prop.list[[j]] <- M["tot.disc", midx]
     }
     if(avg.by.prop) rate.list[[ct]] <- avg_by_prop(tpr.list, fpr.list, prop.list)
-      else if(avg.by.prop) rate.list[[ct]] <- avg_by_interp(tpr.list, fpr.list)
+      else rate.list[[ct]] <- avg_by_interp(tpr.list, fpr.list)
     ct <- ct + 1
     cat("\n")
   }
