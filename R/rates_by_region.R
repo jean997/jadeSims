@@ -132,8 +132,30 @@ plot_rates <- function(rate.list, cols, max.prop=0.5){
   for(i in 2:N){
     lines(rate.list[[i]]$prop, rate.list[[i]]$fpr, col=cols[i])
   }
-
 }
+
+
+plot_rates2 <- function(rate.list, cols, main=""){
+  N <- length(rate.list)-1
+
+  ix <- seq(1, length(rate.list[[1]]$fpr), length.out=11)
+
+  plotCI(x=rate.list[[1]]$fpr[whichCI], y=rate.list[[1]]$tpr[whichCI],
+         uiw=rate.list[[1]]$s.e[whichCI], err="y", ylim=c(0, 1), xlim=c(0, 1),
+         pch=0, main=main, xlab="FPR", ylab="TPR", cex.lab=1.5, col=cols[1], cex.main=2.5)
+
+  lines(rate.list[[1]]$fpr, rate.list[[1]]$tpr, lwd=1.5)
+  for(i in 2:N){
+    plotCI(x=rate.list[[i]]$fpr[whichCI], y=rate.list[[i]]$tpr[whichCI],
+           uiw=rate.list[[i]]$s.e[whichCI], err="y", col=c, add=TRUE, pch=0)
+    lines(rate.list[[i]]$fpr, rate.list[[i]]$tpr, col=cols[i], lwd=1.5)
+  }
+  legend("bottomright", legend=rate.list$names, lty=1, col=cols)
+}
+
+
+
+
 get_regions <- function(x, min.length=3, merge.margin=0){
   q0 <- matrix(nrow=0, ncol=2)
   if(class(x)=="logical") ind <- x
