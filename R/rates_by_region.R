@@ -162,9 +162,22 @@ get_regions <- function(x, min.length=3, merge.margin=0){
     else ind <- x==1
   y <- rle(ind)
   n <- length(y$values)
-  #Merge first
   starts <- cumsum(c(1, y$lengths[-n]))
   stops <- cumsum(y$lengths)
+  #Threshold first
+  if(min.length > 1){
+    idx <- which(y$lengths < min.length & y$values ==TRUE)
+    for(j in idx){
+      ind[starts[j]:stops[j]] <- FALSE
+    }
+    y <- rle(ind)
+    n <- length(y$values)
+    starts <- cumsum(c(1, y$lengths[-n]))
+    stops <- cumsum(y$lengths)
+  }
+
+
+  #Then Merge
   if(merge.margin > 0){
     idx <- which(y$lengths <= merge.margin & (y$values == FALSE| is.na(y$values)))
     idx <- idx[!idx ==1]
@@ -177,20 +190,10 @@ get_regions <- function(x, min.length=3, merge.margin=0){
     starts <- cumsum(c(1, y$lengths[-n]))
     stops <- cumsum(y$lengths)
   }
-  #Then threshold
-  if(min.length > 1){
-    idx <- which(y$lengths < min.length & y$values ==TRUE)
-    for(j in idx){
-      ind[starts[j]:stops[j]] <- FALSE
-    }
-    y <- rle(ind)
-    n <- length(y$values)
-    starts <- cumsum(c(1, y$lengths[-n]))
-    stops <- cumsum(y$lengths)
-  }
+
   idx <- which(y$values==TRUE)
-  starts <- st.copy <- starts[idx]
-  stops <- sp.copy <-  stops[idx]
+  starts <- starts[idx]
+  stops <- stops[idx]
   q0 <- cbind(starts, stops)
 
   #q0I <- Intervals(q0)
