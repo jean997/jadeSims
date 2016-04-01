@@ -138,7 +138,7 @@ plot_rates <- function(rate.list, cols, max.prop=0.5){
 plot_rates2 <- function(rate.list, cols, main=""){
   N <- length(rate.list)-1
 
-  ix <- seq(1, length(rate.list[[1]]$fpr), length.out=11)
+  whichCI <- seq(1, length(rate.list[[1]]$fpr), length.out=11)
 
   plotCI(x=rate.list[[1]]$fpr[whichCI], y=rate.list[[1]]$tpr[whichCI],
          uiw=rate.list[[1]]$s.e[whichCI], err="y", ylim=c(0, 1), xlim=c(0, 1),
