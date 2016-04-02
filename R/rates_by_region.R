@@ -4,6 +4,11 @@ rates_by_region <- function(x, labels,
   labI <- Intervals(get_regions(labels, merge.margin=0, min.length=1), type="Z")
   xI <- Intervals(get_regions(x, merge.margin=merge.margin, min.length=min.length), type="Z")
 
+  if(nrow(xI)==0){
+    return(c("fp.ct"=0, "fpr"=0, "tpr"=0, "tp.ct"=0,
+             "disc"=rep(0, nrow(labI)), "tot.disc"=0))
+  }
+
   ov_X<- distance_to_nearest(xI, labI)
 
   ov_L <- distance_to_nearest(labI, xI)
@@ -66,19 +71,22 @@ get_region_rates <- function(agg.obj,
   fpr.list <- list()
   prop.list <- list()
   cat("JADE\n")
+  rm.idx <- c()
   for(j in 1:N){
     cat(j, " ")
     jade.rates <-apply(agg.obj$all.sep[[j]], MARGIN=2, FUN=function(x){
       unlist(rates_by_region(x, labels, merge.margin, min.length, min.acc))
     })
     midx <- which(jade.rates["tot.disc",] <= max.prop)
+    cat(length(midx), "\n")
     tpr.list[[j]] <- jade.rates["tpr", midx]
     fpr.list[[j]] <- jade.rates["fpr",midx]
     prop.list[[j]] <- jade.rates["tot.disc", midx]
+    if(all(fpr.list[[j]]==0)) rm.idx <- c(rm.idx, j)
   }
   cat("\n")
   if(avg.by.prop) rate.list[[ct]] <- avg_by_prop(tpr.list, fpr.list, prop.list)
-    else rate.list[[ct]] <- avg_by_interp(tpr.list, fpr.list)
+    else rate.list[[ct]] <- avg_by_interp(tpr.list[-rm.idx], fpr.list[-rm.idx])
 
   ct <- ct + 1
 
