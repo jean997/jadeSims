@@ -147,7 +147,7 @@ plot_rates2 <- function(rate.list, cols, main=""){
   lines(rate.list[[1]]$fpr, rate.list[[1]]$tpr, lwd=1.5)
   for(i in 2:N){
     plotCI(x=rate.list[[i]]$fpr[whichCI], y=rate.list[[i]]$tpr[whichCI],
-           uiw=rate.list[[i]]$s.e[whichCI], err="y", col=c, add=TRUE, pch=0)
+           uiw=rate.list[[i]]$s.e[whichCI], err="y", col=cols[i], add=TRUE, pch=0)
     lines(rate.list[[i]]$fpr, rate.list[[i]]$tpr, col=cols[i], lwd=1.5)
   }
   legend("bottomright", legend=rate.list$names, lty=1, col=cols)
