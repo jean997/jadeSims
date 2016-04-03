@@ -86,8 +86,8 @@ get_region_rates <- function(agg.obj,
   }
   cat("\n")
   if(avg.by.prop) rate.list[[ct]] <- avg_by_prop(tpr.list, fpr.list, prop.list)
-    else rate.list[[ct]] <- avg_by_interp(tpr.list[-rm.idx], fpr.list[-rm.idx])
-
+    else if(length(rm.idx) > 0) rate.list[[ct]] <- avg_by_interp(tpr.list[-rm.idx], fpr.list[-rm.idx])
+      else rate.list[[ct]] <- avg_by_interp(tpr.list, fpr.list)
   ct <- ct + 1
 
   for(ix in which.stats){
