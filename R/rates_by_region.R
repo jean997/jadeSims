@@ -75,7 +75,7 @@ get_region_rates <- function(agg.obj,
   for(j in 1:N){
     cat(j, " ")
     jade.rates <-apply(agg.obj$all.sep[[j]], MARGIN=2, FUN=function(x){
-      unlist(rates_by_region(x, labels, merge.margin, min.length, min.acc))
+      unlist(jadeSims:::rates_by_region(x, labels, merge.margin, min.length, min.acc))
     })
     midx <- which(jade.rates["tot.disc",] <= max.prop)
     cat(length(midx), "\n")
@@ -97,16 +97,18 @@ get_region_rates <- function(agg.obj,
     prop.list <- list()
     for(j in 1:N){
       cat(j, " ")
-      q <- quantile(agg.obj$all.stats[j, , ix], probs=1-min.acc)
+      q <- quantile(agg.obj$all.stats[j, , ix], probs=1-max.prop)
       sort.p <- sort(agg.obj$all.stats[j, ,ix])
       sort.p <- sort.p[sort.p <= q]
       M <- sapply(sort.p, FUN=function(t, stats, sort.p){
         x <- stats < t
-        unlist(rates_by_region(x, labels, merge.margin, min.length, min.acc))
+        unlist(jadeSims:::rates_by_region(x, labels, merge.margin, min.length, min.acc))
       }, stats=agg.obj$all.stats[j, , ix], sort.p=sort.p)
       midx <- which(M["tot.disc",] <= max.prop)
+      cat(length(midx), " ")
       tpr.list[[j]] <- M["tpr", midx]
       fpr.list[[j]] <- M["fpr",midx]
+      cat(sum(fpr.list[[j]]==0), "\n")
       prop.list[[j]] <- M["tot.disc", midx]
     }
     if(avg.by.prop) rate.list[[ct]] <- avg_by_prop(tpr.list, fpr.list, prop.list)

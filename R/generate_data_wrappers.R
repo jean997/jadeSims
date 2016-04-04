@@ -113,3 +113,29 @@ generate_data_long <- function(arsd, rho, n.rep, sample.size=c(20, 20)){
     alternatives_normal(file.prefix = file.prefix)
   }
 }
+
+
+#'@title Wrapper to generate normal data with short profiles
+#'@description Generate normal data. Run form a directory with a "data/" subdirectory.
+#'@export
+generate_data_short <- function(arsd, rho, re, n.rep,prefix, sample.size){
+  #set.seed(2222222)
+  sample.size=c(20, 20)
+  p <- dim(normal_profiles2)[1]
+  K <- dim(normal_profiles2)[2]
+
+  for(rep in 1:n.rep){
+    file.prefix <- paste0(prefix, "_sd_", arsd, "_rho_", rho, "_re_", re, "_n", rep)
+    data.file <- paste0("data/", file.prefix, "_data.RData")
+    y <- matrix(nrow=p, ncol=K)
+    full.data <- matrix(nrow=p, ncol=0)
+    for(i in 1:K){
+      my.y <- replicate(n=sample.size[i],
+                        expr=normal_data(normal_profiles[,i], arsd, rho, re))
+      full.data <- cbind(full.data, my.y)
+    }
+    R <- list("Y"=full.data, "sample.size"=sample.size)
+    save(R, file=data.file)
+    alternatives_normal(file.prefix = file.prefix)
+  }
+}

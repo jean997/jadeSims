@@ -4,8 +4,8 @@
 \alias{get_region_rates}
 \title{Get average region level tpr and fpr from and agg object}
 \usage{
-get_region_rates(agg.obj, stat.names, merge.margin = 0, min.length = 1,
-  min.acc = 0)
+get_region_rates(agg.obj, stat.names, avg.by.prop = FALSE, max.prop = 0.5,
+  merge.margin = 0, min.length = 1, min.acc = 0)
 }
 \arguments{
 \item{agg.obj}{An object produced by aggregate_sims}
