@@ -95,6 +95,7 @@ get_region_rates <- function(agg.obj,
     tpr.list <- list()
     fpr.list <- list()
     prop.list <- list()
+    rm.idx <- c()
     for(j in 1:N){
       cat(j, " ")
       q <- quantile(agg.obj$all.stats[j, , ix], probs=max.prop)
@@ -109,10 +110,12 @@ get_region_rates <- function(agg.obj,
       tpr.list[[j]] <- M["tpr", midx]
       fpr.list[[j]] <- M["fpr",midx]
       cat(sum(fpr.list[[j]]==0), "\n")
+      if(all(fpr.list[[j]]==0)) rm.idx <- c(rm.idx, j)
       prop.list[[j]] <- M["tot.disc", midx]
     }
     if(avg.by.prop) rate.list[[ct]] <- avg_by_prop(tpr.list, fpr.list, prop.list)
-      else rate.list[[ct]] <- avg_by_interp(tpr.list, fpr.list)
+      else if(length(rm.idx) > 0) rate.list[[ct]] <- avg_by_interp(tpr.list[-rm.idx], fpr.list[-rm.idx])
+        else rate.list[[ct]] <- avg_by_interp(tpr.list, fpr.list)
     ct <- ct + 1
     cat("\n")
   }
