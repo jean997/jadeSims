@@ -17,6 +17,22 @@ normal_data <- function(profile, sd, rho, reff.sd){
 }
 
 
+
+#'Simulate binomial data from given read counts
+#'@description Simulate binomial data conditional on number of reads observed.
+#'@param profile Mean values (length p)
+#'@param reads Reads per site.
+#'@param reff.sd Standard deviation of random effects
+#'@return A data frame with columns y and reads
+#'@export
+binomial_data <- function(profile, reads, reff.sd){
+  p <- length(profile)
+  if(reff.sd > 0) profile <- shift_profile(profile, reff.sd)
+  y <- rbinom(n=p, size=reads, prob=profile)
+  R <- data.frame("y"=y, "reads"=reads)
+  return(R)
+}
+
 #'Simulate binomial data
 #'@description Simulate binomial data
 #'by tiling reads.

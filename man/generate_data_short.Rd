@@ -4,7 +4,7 @@
 \alias{generate_data_short}
 \title{Wrapper to generate normal data with short profiles}
 \usage{
-generate_data_short(arsd, rho, re, n.rep, prefix, sample.size)
+generate_data_short(sigma, rho, re, n.rep, prefix, sample.size)
 }
 \description{
 Generate normal data. Run form a directory with a "data/" subdirectory.
