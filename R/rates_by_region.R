@@ -97,7 +97,7 @@ get_region_rates <- function(agg.obj,
     prop.list <- list()
     for(j in 1:N){
       cat(j, " ")
-      q <- quantile(agg.obj$all.stats[j, , ix], probs=1-max.prop)
+      q <- quantile(agg.obj$all.stats[j, , ix], probs=max.prop)
       sort.p <- sort(agg.obj$all.stats[j, ,ix])
       sort.p <- sort.p[sort.p <= q]
       M <- sapply(sort.p, FUN=function(t, stats, sort.p){
