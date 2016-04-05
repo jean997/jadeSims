@@ -152,15 +152,17 @@ fit_withttest_binom <- function(phat, reads, sites, B=100, type=c("spline", "loc
 
 ttest.func <- function(x, sample.size){
   labs <- c(rep(0, sample.size[1]), rep(1,sample.size[2]))
+  s1 <- sum(!is.na(x[labs==0]))
+  s2 <- sum(!is.na(x[labs==1]))
+  if(s1 < 3 | s2 < 3) return(NA)
   t <- t.test(x~ labs)
   return(t$p.value)
 }
 
-spline.func <- function(x, sites, ns=70){
+spline.func <- function(x, sites){
   ix <- which(!is.na(x))
   f <- smooth.spline(x=sites[ix], y=x[ix], cv=TRUE)
-  y <- rep(NA, length(x))
-  y[ix] <- f$y
+  y <- predict(f, x=sites)$y
   return(y)
 }
 
