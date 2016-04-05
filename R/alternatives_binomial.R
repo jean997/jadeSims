@@ -6,7 +6,8 @@
 #'@param tmpdir Directory to use for temporary files.
 #'@return Nothing
 #'@export
-alternatives_binomial <- function(file.prefix, bs.factor=5, tmpdir="."){
+alternatives_binomial <- function(file.prefix, bs.factor=5, tmpdir=".",
+                                  sites=1:p, bs.ns=70){
   data.file <- paste0("data/", file.prefix, "_data.RData")
   out.file <- paste0("alt/", file.prefix, "_altpvals.RData")
   #cat(out.file, "\n")
@@ -15,8 +16,6 @@ alternatives_binomial <- function(file.prefix, bs.factor=5, tmpdir="."){
   p <- dim(R$Y)[1]
   k <- dim(R$Y)[2]
   K <- length(R$sample.size)
-
-  sites <- 1:p
 
   y <- reads <- yhat <- matrix(nrow=p, ncol=K)
   strt <- c(1)
@@ -75,7 +74,7 @@ alternatives_binomial <- function(file.prefix, bs.factor=5, tmpdir="."){
   B.raw <- BSseq( chr=rep(1, p), pos=round(sites*bs.factor, digits=0),
                   M=R$Y, Cov=R$READS,
                   sampleNames=c(paste0("H", 1:R$sample.size[1]), paste0("D", 1:R$sample.size[2])))
-  B.smooth <- BSmooth(B.raw)
+  B.smooth <- BSmooth(B.raw, ns=bs.ns)
   B.tstat <- BSmooth.tstat(B.smooth, group1=paste0("H", 1:R$sample.size[1]) ,
                            group2=paste0("D", 1:R$sample.size[2]))
   bsseq.tstat <- B.tstat@stats[,"tstat"]
@@ -97,8 +96,8 @@ alternatives_binomial <- function(file.prefix, bs.factor=5, tmpdir="."){
   #Locfit + T-test
   #locfit.binom.func uses the same parameters as bsmooth
   locfit.binom.Y <-  apply(rbind(R$Y, R$READS), MARGIN=2,
-                           FUN=locfit.binom.func, sites=round(sites*1e6, digits=0))
-  locfit.wt.ttests <- fit_withttest_binom(yhat, reads, sites, B=100, type="locfit")
+                           FUN=locfit.binom.func, sites=round(sites*bs.factor, digits=0), ns=bs.ns)
+  locfit.wt.ttests <- fit_withttest_binom(yhat, reads, sites, B=100, type="locfit", bs.ns=bs.ns)
   locfit.pvals <- apply(locfit.binom.Y, MARGIN=1, FUN=ttest.func, sample.size=R$sample.size)
 
 
@@ -122,7 +121,7 @@ alternatives_binomial <- function(file.prefix, bs.factor=5, tmpdir="."){
 #Utility functions for alternative methods
 
 #Weights t-test to reflect variability of fit resampling binomial
-fit_withttest_binom <- function(phat, reads, sites, B=100, type=c("spline", "locfit")){
+fit_withttest_binom <- function(phat, reads, sites, B=100, type=c("spline", "locfit"), bs.ns=70){
   type <- match.arg(type)
   p <- dim(reads)[1]
   avg <- matrix(0, p , 2)
@@ -135,7 +134,7 @@ fit_withttest_binom <- function(phat, reads, sites, B=100, type=c("spline", "loc
       if(type=="spline"){
         fits[,i] <- spline.func(myy/reads[,j], sites)
       }else if(type=="locfit"){
-        fits[,i] <- locfit.binom.func(c(myy,reads[,j]), round(sites*1e6, digits=0))
+        fits[,i] <- locfit.binom.func(c(myy,reads[,j]), round(sites*1e6, digits=0), ns=bs.ns)
       }
       i <- i+1
     }
@@ -157,17 +156,20 @@ ttest.func <- function(x, sample.size){
   return(t$p.value)
 }
 
-spline.func <- function(x, sites){
-  f <- smooth.spline(x=sites, y=x, cv=TRUE)
-  return(f$y)
+spline.func <- function(x, sites, ns=70){
+  ix <- which(!is.na(x))
+  f <- smooth.spline(x=sites[ix], y=x[ix], cv=TRUE)
+  y <- rep(NA, length(x))
+  y[ix] <- f$y
+  return(y)
 }
 
-locfit.binom.func <- function(x, sites){
+locfit.binom.func <- function(x, sites, ns){
   p <- length(sites)
   y <- x[1:p]; reads <- x[(p+1):(2*p)]
 
   sdata <- data.frame(pos = sites, M = pmin(pmax(y, 0.01), reads - 0.01), Cov = reads)
-  fit <- locfit(M~lp(pos, nn=(70/p), h=1000),
+  fit <- locfit(M~lp(pos, nn=(ns/p), h=1000),
                 weights=reads, family="binomial", data=sdata, maxk=10000)
   pp <- preplot(fit, where="data")
   return(expit(pp$fit))

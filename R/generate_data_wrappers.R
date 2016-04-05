@@ -170,5 +170,7 @@ generate_data_meth <- function(prefix, re, sample.size,
     R <- list("Y"=full.counts, "READS"=full.reads,
               "sample.size"=sample.size)
     save(R, file=data.file)
+    alternatives_binomial(file.prefix=file.prefix, bs.factor=1, bs.ns=40,
+                          sites=binom_meth_pos)
   }
 }
