@@ -19,7 +19,7 @@
 #'@export
 aggregate_sims <- function(file.prefix, profiles, save.file=NULL,
                                  which.reps=1:60, tol=5e-3, level=0.1,
-                                 run.cv=TRUE, clean.jade=FALSE){
+                                 run.cv=TRUE, clean.jade=FALSE, use.cv=TRUE){
   n.sims <- length(which.reps)
   p <- dim(profiles)[1]
   K <- dim(profiles)[2]
@@ -82,15 +82,18 @@ aggregate_sims <- function(file.prefix, profiles, save.file=NULL,
     }
     all.sep[[j]] <- sep
 
-    if(run.cv){
-      cv.obj <- cv_err_wts(orig.path.file, path.file.list,
+    #CV
+    if(use.cv){
+      if(run.cv){
+        cv.obj <- cv_err_wts(orig.path.file, path.file.list,
                          use.converged.only=TRUE, control.l1=TRUE)
-      save(cv.obj, file=jade.cv.file)
-    }else{
-      cv.obj <- getobj(jade.cv.file)
+        save(cv.obj, file=jade.cv.file)
+      }else{
+        cv.obj <- getobj(jade.cv.file)
+      }
+      all.tpr[j, length(pnames)+1] <- tpr.func(sep[, cv.obj$cv.1se.l1], site.labels)
+      all.fpr[j, length(pnames)+1] <- fpr.func(sep[, cv.obj$cv.1se.l1], site.labels)
     }
-    all.tpr[j, length(pnames)+1] <- tpr.func(sep[, cv.obj$cv.1se.l1], site.labels)
-    all.fpr[j, length(pnames)+1] <- fpr.func(sep[, cv.obj$cv.1se.l1], site.labels)
     j <- j+1
   }
 
