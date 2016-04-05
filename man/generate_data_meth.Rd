@@ -4,7 +4,8 @@
 \alias{generate_data_meth}
 \title{Wrapper to generate binomial data based on methylation}
 \usage{
-generate_data_meth(prefix, re, sample.size, n.rep, seed = NULL)
+generate_data_meth(prefix, re, sample.size, n.rep, rd.factor = 1,
+  seed = NULL)
 }
 \description{
 Generate binomial data.

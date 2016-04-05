@@ -4,7 +4,8 @@
 \alias{alternatives_binomial}
 \title{Run alternative methods for binomial simulations}
 \usage{
-alternatives_binomial(file.prefix, bs.factor = 5, tmpdir = ".")
+alternatives_binomial(file.prefix, bs.factor = 5, tmpdir = ".",
+  sites = 1:p, bs.ns = 70)
 }
 \arguments{
 \item{file.prefix}{File prefixe}
