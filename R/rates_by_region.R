@@ -5,8 +5,8 @@ rates_by_region <- function(x, labels,
   xI <- Intervals(get_regions(x, merge.margin=merge.margin, min.length=min.length), type="Z")
 
   if(nrow(xI)==0){
-    return(c("fp.ct"=0, "fpr"=0, "tpr"=0, "tp.ct"=0,
-             "disc"=rep(0, nrow(labI)), "tot.disc"=0))
+    return(c("fp.ct"=0, "fdp"=0, "tpr"=0, "tp.ct"=0,
+             "tot.disc"=0))
   }
 
   ov_X<- distance_to_nearest(xI, labI)
@@ -36,11 +36,11 @@ rates_by_region <- function(x, labels,
   disc[ov_LTP==0] <- 1
 
 
-  fpr <- fp.ct /(fp.ct + tp.ct)
+  fdp <- fp.ct /(fp.ct + tp.ct)
   p <- length(x)
   tot.disc <- sum(size(xI))/p
-  return(c("fp.ct"=fp.ct, "fpr"=fpr, "tpr"=sum(disc)/nrow(labI), "tp.ct"=tp.ct,
-             "disc"=disc, "tot.disc"=tot.disc))
+  return(c("fp.ct"=fp.ct, "fdp"=fdp, "tpr"=sum(disc)/nrow(labI), "tp.ct"=tp.ct,
+           "tot.disc"=tot.disc))
 }
 
 
@@ -53,7 +53,7 @@ rates_by_region <- function(x, labels,
 #'@return A list of objects produced by get_tpr_fpr
 #'@export
 get_region_rates <- function(agg.obj,
-                            stat.names, avg.by.prop=FALSE, max.prop=0.5,
+                            stat.names, max.prop=0.5,
                              merge.margin=0, min.length=1, min.acc=0){
   #For each stat at each p-value level - p x length(which.stats) x 5
   #For jade at each level of gamma ngamma x 5
@@ -68,26 +68,29 @@ get_region_rates <- function(agg.obj,
   ct <- 1
 
   tpr.list <- list()
-  fpr.list <- list()
+  fdp.list <- list()
+  fct.list <- list()
   prop.list <- list()
   cat("JADE\n")
-  rm.idx <- c()
+  #rm.idx <- c()
   for(j in 1:N){
     cat(j, " ")
     jade.rates <-apply(agg.obj$all.sep[[j]], MARGIN=2, FUN=function(x){
-      unlist(jadeSims:::rates_by_region(x, labels, merge.margin, min.length, min.acc))
+      jadeSims:::rates_by_region(x, labels, merge.margin, min.length, min.acc)
     })
     midx <- which(jade.rates["tot.disc",] <= max.prop)
     cat(length(midx), "\n")
     tpr.list[[j]] <- jade.rates["tpr", midx]
-    fpr.list[[j]] <- jade.rates["fpr",midx]
+    fdp.list[[j]] <- jade.rates["fdp",midx]
+    fct.list[[j]] <- jade.rates["fp.ct", midx]
     prop.list[[j]] <- jade.rates["tot.disc", midx]
-    if(all(fpr.list[[j]]==0)) rm.idx <- c(rm.idx, j)
+    #if(all(fct.list[[j]]==0)) rm.idx <- c(rm.idx, j)
   }
   cat("\n")
-  if(avg.by.prop) rate.list[[ct]] <- avg_by_prop(tpr.list, fpr.list, prop.list)
-    else if(length(rm.idx) > 0) rate.list[[ct]] <- avg_by_interp(tpr.list[-rm.idx], fpr.list[-rm.idx])
-      else rate.list[[ct]] <- avg_by_interp(tpr.list, fpr.list)
+  #if(avg.by.prop) rate.list[[ct]] <- avg_by_prop(tpr.list, fpr.list, prop.list)
+   # else if(length(rm.idx) > 0) rate.list[[ct]] <- avg_by_interp(tpr.list[-rm.idx], fpr.list[-rm.idx])
+  #    else rate.list[[ct]] <- avg_by_interp(tpr.list, fpr.list)
+  rate.list[[ct]] <- avg_by_ct(tpr.list, fct.list)
   ct <- ct + 1
 
   for(ix in which.stats){
@@ -95,7 +98,6 @@ get_region_rates <- function(agg.obj,
     tpr.list <- list()
     fpr.list <- list()
     prop.list <- list()
-    rm.idx <- c()
     for(j in 1:N){
       cat(j, " ")
       q <- quantile(agg.obj$all.stats[j, , ix], probs=max.prop)
@@ -108,14 +110,11 @@ get_region_rates <- function(agg.obj,
       midx <- which(M["tot.disc",] <= max.prop)
       cat(length(midx), " ")
       tpr.list[[j]] <- M["tpr", midx]
-      fpr.list[[j]] <- M["fpr",midx]
-      cat(sum(fpr.list[[j]]==0), "\n")
-      if(all(fpr.list[[j]]==0)) rm.idx <- c(rm.idx, j)
+      fdp.list[[j]] <- M["fdp",midx]
+      fct.list[[j]] <- M["fp.ct", midx]
       prop.list[[j]] <- M["tot.disc", midx]
     }
-    if(avg.by.prop) rate.list[[ct]] <- avg_by_prop(tpr.list, fpr.list, prop.list)
-      else if(length(rm.idx) > 0) rate.list[[ct]] <- avg_by_interp(tpr.list[-rm.idx], fpr.list[-rm.idx])
-        else rate.list[[ct]] <- avg_by_interp(tpr.list, fpr.list)
+    rate.list[[ct]] <- avg_by_ct(tpr.list, fct.list)
     ct <- ct + 1
     cat("\n")
   }
@@ -151,17 +150,17 @@ plot_rates <- function(rate.list, cols, max.prop=0.5){
 plot_rates2 <- function(rate.list, cols, main=""){
   N <- length(rate.list)-1
 
-  whichCI <- seq(1, length(rate.list[[1]]$fpr), length.out=11)
+  whichCI <- seq(1, length(rate.list[[1]]$fct), length.out=11)
 
-  plotCI(x=rate.list[[1]]$fpr[whichCI], y=rate.list[[1]]$tpr[whichCI],
+  plotCI(x=rate.list[[1]]$fct[whichCI], y=rate.list[[1]]$tpr[whichCI],
          uiw=rate.list[[1]]$s.e[whichCI], err="y", ylim=c(0, 1), xlim=c(0, 1),
-         pch=0, main=main, xlab="FPR", ylab="TPR", cex.lab=1.5, col=cols[1], cex.main=2.5)
+         pch=0, main=main, xlab="False Positive Count", ylab="TPR", cex.lab=1.5, col=cols[1], cex.main=2.5)
 
-  lines(rate.list[[1]]$fpr, rate.list[[1]]$tpr, lwd=1.5)
+  lines(rate.list[[1]]$fctr, rate.list[[1]]$tpr, lwd=1.5)
   for(i in 2:N){
-    plotCI(x=rate.list[[i]]$fpr[whichCI], y=rate.list[[i]]$tpr[whichCI],
+    plotCI(x=rate.list[[i]]$fct[whichCI], y=rate.list[[i]]$tpr[whichCI],
            uiw=rate.list[[i]]$s.e[whichCI], err="y", col=cols[i], add=TRUE, pch=0)
-    lines(rate.list[[i]]$fpr, rate.list[[i]]$tpr, col=cols[i], lwd=1.5)
+    lines(rate.list[[i]]$fct, rate.list[[i]]$tpr, col=cols[i], lwd=1.5)
   }
   legend("bottomright", legend=rate.list$names, lty=1, col=cols)
 }
