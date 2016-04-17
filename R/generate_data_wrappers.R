@@ -1,14 +1,14 @@
 #'@title Wrapper to generate binomial data
 #'@description Generate binomial data. Run form a directory with a "data/" subdirectory.
 #'@export
-generate_data_binomial <- function(){
-  set.seed(1111111)
+generate_data_binomial <- function(seed=1111111, start.rep=1, stop.rep=60){
+  set.seed(seed)
   sample.size=c(10, 10)
   data("binom_profiles", package="jadeSims")
   p <- dim(binom_profiles)[1]
   K <- dim(binom_profiles)[2]
   for(re in c(0, 0.02, 0.05, 0.07)){
-    for(rep in 1:60){
+    for(rep in start.rep:stop.rep){
       file.prefix <- paste0("binom_", re, "_n", rep)
       data.file <- paste0("data/", file.prefix, "_data.RData")
       full.counts <- matrix(nrow=p, ncol=0)
@@ -25,6 +25,7 @@ generate_data_binomial <- function(){
       }
       R <- list("Y"=full.counts, "READS"=full.reads, "sample.size"=sample.size)
       save(R, file=data.file)
+      alternatives_binomial(file.prefix=file.prefix)
     }
   }
 }
@@ -32,15 +33,15 @@ generate_data_binomial <- function(){
 #'@title Wrapper to generate normal auto-regressive data
 #'@description Generate normal AR  data. Run form a directory with a "data/" subdirectory.
 #'@export
-generate_data_ar <- function(){
-  set.seed(2222222)
+generate_data_ar <- function(seed=2222222, start.rep=1, stop.rep=60){
+  set.seed(seed)
   sample.size=c(10, 10)
   data("normal_profiles", package="jadeSims")
   p <- dim(normal_profiles)[1]
   K <- dim(normal_profiles)[2]
   for(arsd in c(0.5, 1, 2)){
     for(rho in c(0, 0.2, 0.4)){
-      for(rep in 1:60){
+      for(rep in start.rep:stop.rep){
         file.prefix <- paste0("ar_sd", arsd, "_rho_", rho, "_n", rep)
         data.file <- paste0("data/", file.prefix, "_data.RData")
         y <- matrix(nrow=p, ncol=K)
@@ -52,6 +53,7 @@ generate_data_ar <- function(){
         }
         R <- list("Y"=full.data, "sample.size"=sample.size)
         save(R, file=data.file)
+        alternatives_normal(file.prefix=file.prefix)
       }
     }
   }
@@ -60,8 +62,8 @@ generate_data_ar <- function(){
 #'@title Wrapper to generate normal data with random effects
 #'@description Generate normal data with random effects. Run form a directory with a "data/" subdirectory.
 #'@export
-generate_data_re <- function(){
-  set.seed(3333333)
+generate_data_re <- function(seed=3333333, start.rep=1, stop.rep=60){
+  set.seed(seed)
   sample.size=c(10, 10)
   data("normal_profiles", package="jadeSims")
   p <- dim(normal_profiles)[1]
@@ -71,7 +73,7 @@ generate_data_re <- function(){
   res <- c(0.5, 0.707, .866, 1)
   perc <- c(5, 10, 15, 20)
   for(l in 1:4){
-    for(rep in 1:60){
+    for(rep in start.rep:stop.rep){
       file.prefix <- paste0("re_", perc[l], "_n", rep)
       data.file <- paste0("data/", file.prefix, "_data.RData")
       y <- matrix(nrow=p, ncol=K)
@@ -83,6 +85,7 @@ generate_data_re <- function(){
       }
       R <- list("Y"=full.data, "sample.size"=sample.size)
       save(R, file=data.file)
+      alternatives_normal(file.prefix=file.prefix)
     }
   }
 }

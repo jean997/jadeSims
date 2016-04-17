@@ -68,21 +68,12 @@ To produce the data sets used in the paper use the wrapper `generate_data_binomi
 
 ```{r, eval=FALSE}
 generate_data_binomial()
+generate_data_binomial(seed=60282, start.rep=61, stop.rep=100)
 ```
 
-Step 2: Run the alternative methods. These include  BSmooth, methylKit and spline and locfit t-test methods (not shown in the paper). The function `alternatives_binomial` runs these and saves results to a file in the `alt/` directory. To run for all the data created in the previous step:
+The wrapper also calls a function `alternatives_binomial` which runs `bsseq` and  `methylKit` and saves results to a file in the `alt/` directory. 
 
-```{r, eval=FALSE}
-for(re in c(0, 0.02, 0.05, 0.07)){
-    for(rep in 1:60){
-      file.prefix <- paste0("binom_", re, "_n", rep)
-      alternatives_binomial(file.prefix=file.prefix)
-    }
-}
-```
-
-
-Step 3: Run JADE: This can take a while so it is better to do it in parallel. The function `run_jade_binomial` calculates the trendfiltering fits at `gamma=0` and runs the full path of solutions for the complete data as well as the cross validation data sets.
+Step 2: Run JADE: This can take a while so it is better to do it in parallel. The function `run_jade_binomial` calculates the trendfiltering fits at `gamma=0` and runs the full path of solutions for the complete data as well as the cross validation data sets.
 
 ```{r, eval=FALSE}
 file.prefix <- "binom_0_n1"
@@ -90,13 +81,13 @@ run_jade_binomial(file.prefix=file.prefix)
 ```
 
 
-Step 4: Aggregate all the results into a  useful data structure. Use the `aggregate_binomial` function:
+Step 3: Aggregate all the results into a  useful data structure. Use the `aggregate_sims` function:
 
 ```{r, eval=FALSE}
-aggregate_sims(file.prefix="binom_0", which.rep=1:60, profiles=binom_profiles, save.file="binom_0_agg.RData", tol=5e-3, level=0.1, run.cv=TRUE)
+aggregate_sims(file.prefix="binom_0", which.rep=1:100, profiles=binom_profiles, save.file="binom_0_agg.RData", tol=5e-3, level=0.1, run.cv=TRUE)
 ```
 
-Step 5: Make Plots
+Step 4: Make Plots
 
 ## Normal simulations with auto regressive errors and with random effects
 These simulations are produced using the same steps as above but with different functions.
@@ -104,10 +95,12 @@ These simulations are produced using the same steps as above but with different 
 Step 1: Generate data. This process uses the `normal_data` function. There are wrappers producing the exact set of data used in the paper.
 ```{r, eval=FALSE}
 generate_data_ar()
+generate_data_ar(seed=95870, start.rep=61, stop.rep=100)
 generate_data_re()
+generate_data_re(seed=46916, start.rep=61, stop.rep=100)
 ```
 
-Step 2: Run alternatives:
+Step 3: Run JADE:
 
 For Auto-regressive errors
 ```{r, eval=FALSE}
@@ -115,7 +108,7 @@ for(arsd in c(0.5, 1, 2)){
     for(rho in c(0, 0.2, 0.4)){
       for(rep in 1:60){
       file.prefix <- paste0("ar_sd", arsd, "_rho_", rho, "_n", rep)
-      alternatives_normal(file.prefix=file.prefix)
+      run_jade_normal(file.prefix=file.prefix)
     }
 }
 ```
@@ -128,15 +121,9 @@ perc <- c(5, 10, 15, 20)
 for(l in 1:4){
   for(rep in 1:60){
     file.prefix <- paste0("re_", perc[l], "_n", rep)
-    alternatives_normal(file.prefix=file.prefix)
+    run_jade_normal(file.prefix=file.prefix)
   }
 }
 ```
 
 
-Step 3: Run JADE - use the file prefixes defined above.
-
-```{r, eval=FALSE}
-file.prefix <-"ar_sd0.5_rho_0_n1"
-run_jade_normal(file.prefix=file.prefix)
-```
