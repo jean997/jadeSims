@@ -10,10 +10,12 @@
 #'@export
 plot_roc_curves <- function(agg.obj,
                             which.stats, cols, ltys, lwd=1.5,
+                            points.pch=16,
                             direction="vertical", n.bars=11, point.cex=2.5,
                             main="", make.legend=FALSE){
   if(direction=="vertical") err="y"
   else err="x"
+  if(length(points.pch)==1) points.pch=rep(points.pch, length(which.stats))
 
   n.sims <- dim(agg.obj$all.stats)[1]
   cat(n.sims, "\n")
@@ -25,6 +27,7 @@ plot_roc_curves <- function(agg.obj,
   stopifnot("jade" %in% which.stats)
   c <- cols[which(which.stats=="jade")]
   l <- ltys[which(which.stats=="jade")]
+  p <- points.pch[which(which.stats=="jade")]
   tpr.list <- list()
   fpr.list <- list()
   for(i in 1:n.sims){
@@ -40,7 +43,7 @@ plot_roc_curves <- function(agg.obj,
          cex.lab=1.5, col=c, cex.main=2.5)
   lines(x=avg_jade$fpr, y=avg_jade$tpr, lwd=lwd, col=c, lty=l)
   j <- which(agg.obj$names=="jade")
-  points(agg.obj$avg.fpr[j], agg.obj$avg.tpr[j], pch=16, col=c, cex=point.cex)
+  points(agg.obj$avg.fpr[j], agg.obj$avg.tpr[j], pch=p, col=c, cex=point.cex)
   ct <- ct+1
 
 
@@ -51,6 +54,7 @@ plot_roc_curves <- function(agg.obj,
     cat(agg.obj$names[j], "..")
     c <- cols[which(which.stats==agg.obj$names[j])]
     l <- ltys[which(which.stats==agg.obj$names[j])]
+    p <- points.pch[which(which.stats==agg.obj$names[j])]
     if( j %in% stat.cols){
       my.pred <- prediction(prediction=abs(t(agg.obj$all.stats[, , j])), labels)
     }else{
@@ -65,7 +69,7 @@ plot_roc_curves <- function(agg.obj,
     plotCI(x=my.interp$fpr[whichCI], y=my.interp$tpr[whichCI],
            uiw=my.interp$s.e[whichCI], err=err, col=c, add=TRUE, pch=0)
     lines(x=my.interp$fpr, y=my.interp$tpr, col=c, lwd=lwd, lty=l)
-    points(agg.obj$avg.fpr[j], agg.obj$avg.tpr[j], pch=16, col=c, cex=point.cex)
+    points(agg.obj$avg.fpr[j], agg.obj$avg.tpr[j], pch=p, col=c, cex=point.cex)
     ct <- ct+ 1
   }
   if(make.legend){
