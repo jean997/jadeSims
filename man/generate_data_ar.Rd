@@ -4,7 +4,7 @@
 \alias{generate_data_ar}
 \title{Wrapper to generate normal auto-regressive data}
 \usage{
-generate_data_ar()
+generate_data_ar(seed = 2222222, start.rep = 1, stop.rep = 60)
 }
 \description{
 Generate normal AR  data. Run form a directory with a "data/" subdirectory.

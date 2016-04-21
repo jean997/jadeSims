@@ -4,7 +4,7 @@
 \alias{generate_data_binomial}
 \title{Wrapper to generate binomial data}
 \usage{
-generate_data_binomial()
+generate_data_binomial(seed = 1111111, start.rep = 1, stop.rep = 60)
 }
 \description{
 Generate binomial data. Run form a directory with a "data/" subdirectory.

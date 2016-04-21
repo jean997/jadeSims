@@ -5,7 +5,8 @@
 \title{Aggregate simulations}
 \usage{
 aggregate_sims(file.prefix, profiles, save.file = NULL, which.reps = 1:60,
-  tol = 0.005, level = 0.1, run.cv = TRUE, clean.jade = FALSE)
+  tol = 0.005, level = 0.1, run.cv = TRUE, clean.jade = FALSE,
+  use.cv = TRUE)
 }
 \arguments{
 \item{file.prefix}{File prefix}

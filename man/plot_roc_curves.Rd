@@ -4,7 +4,8 @@
 \alias{plot_roc_curves}
 \title{Plot ROC curves for simulations}
 \usage{
-plot_roc_curves(agg.obj, which.stats, cols, direction = "vertical",
+plot_roc_curves(agg.obj, which.stats, cols, ltys, lwd = 1.5,
+  points.pch = 16, direction = "vertical", n.bars = 11, point.cex = 2.5,
   main = "", make.legend = FALSE)
 }
 \arguments{

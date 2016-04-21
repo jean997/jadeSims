@@ -4,7 +4,8 @@
 \alias{generate_data_long}
 \title{Wrapper to generate normal auto-regressive data with long profiles}
 \usage{
-generate_data_long(arsd, rho, n.rep, sample.size = c(20, 20))
+generate_data_long(sig, rho, re, start.rep, stop.rep, sample.size = c(10, 10),
+  seed = NULL)
 }
 \description{
 Generate normal AR  data. Run form a directory with a "data/" subdirectory.

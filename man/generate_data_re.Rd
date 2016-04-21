@@ -4,7 +4,7 @@
 \alias{generate_data_re}
 \title{Wrapper to generate normal data with random effects}
 \usage{
-generate_data_re()
+generate_data_re(seed = 3333333, start.rep = 1, stop.rep = 60)
 }
 \description{
 Generate normal data with random effects. Run form a directory with a "data/" subdirectory.
