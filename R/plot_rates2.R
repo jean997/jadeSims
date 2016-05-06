@@ -7,7 +7,7 @@
 #'@param lwd Line Width
 #'@return Nothing
 #'@export
-plot_rates2 <- function(rate.list, cols, ltys, main="", lwd=1.5){
+plot_rates2 <- function(rate.list, cols, ltys, main="", lwd=1.5, make.legend=FALSE){
   N <- length(rate.list)-1
 
   whichCI <- seq(1, length(rate.list[[1]]$fct), length.out=11)
@@ -25,5 +25,5 @@ plot_rates2 <- function(rate.list, cols, ltys, main="", lwd=1.5){
            uiw=rate.list[[i]]$s.e[whichCI], err="y", col=cols[i], add=TRUE, pch=0)
     lines(rate.list[[i]]$fct, rate.list[[i]]$tpr, col=cols[i], lwd=lwd, lty=ltys[i])
   }
-  legend("bottomright", legend=rate.list$names, lty=1, col=cols)
+  if(make.legend) legend("bottomright", legend=rate.list$names, lty=1, col=cols)
 }
