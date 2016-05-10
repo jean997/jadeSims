@@ -7,7 +7,8 @@
 #'@param lwd Line Width
 #'@return Nothing
 #'@export
-plot_rates2 <- function(rate.list, cols, ltys, main="", lwd=1.5, make.legend=FALSE){
+plot_rates2 <- function(rate.list, cols, ltys, main="",
+                        lwd=1.5, make.legend=FALSE, cex.lab=1.5, cex.main=2.5){
   N <- length(rate.list)-1
 
   whichCI <- seq(1, length(rate.list[[1]]$fct), length.out=11)
@@ -16,8 +17,8 @@ plot_rates2 <- function(rate.list, cols, ltys, main="", lwd=1.5, make.legend=FAL
   for(i in 2:N) m <- max(m, rate.list[[i]]$fct)
   plotCI(x=rate.list[[1]]$fct[whichCI], y=rate.list[[1]]$tpr[whichCI],
          uiw=rate.list[[1]]$s.e[whichCI], err="y", xlim=c(0, m), ylim=c(0, 1),
-         pch=0, main=main, xlab="Number of False Detections",
-         ylab="TPR", cex.lab=1.5, col=cols[1], cex.main=2.5)
+         pch=0, main=main, xlab="False Positives",
+         ylab="TPR", cex.lab=cex.lab, col=cols[1], cex.main=cex.main)
 
   lines(rate.list[[1]]$fct, rate.list[[1]]$tpr, lwd=lwd, col=cols[1], lty=ltys[1])
   for(i in 2:N){
