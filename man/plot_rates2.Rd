@@ -4,7 +4,8 @@
 \alias{plot_rates2}
 \title{Plot ROC curves for simulations}
 \usage{
-plot_rates2(rate.list, cols, ltys, main = "", lwd = 1.5)
+plot_rates2(rate.list, cols, ltys, main = "", lwd = 1.5,
+  make.legend = FALSE, cex.lab = 1.5, cex.main = 2.5)
 }
 \arguments{
 \item{rate.list}{An object produced by}
