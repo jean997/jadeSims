@@ -1,6 +1,6 @@
 #'@title Plot ROC curves for simulations
 #'@description Plot ROC curves for JADE and any other methods
-#'@param rate.list An object produced by
+#'@param rate.list An object produced by avg_by_ct
 #'@param cols Colors
 #'@param ltys Line types
 #'@param main Plot title

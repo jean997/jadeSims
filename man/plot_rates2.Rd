@@ -5,10 +5,10 @@
 \title{Plot ROC curves for simulations}
 \usage{
 plot_rates2(rate.list, cols, ltys, main = "", lwd = 1.5,
-  make.legend = FALSE, cex.lab = 1.5, cex.main = 2.5)
+  make.legend = FALSE, cex.axis = 1, cex.lab = 1.5, cex.main = 2.5)
 }
 \arguments{
-\item{rate.list}{An object produced by}
+\item{rate.list}{An object produced by avg_by_ct}
 
 \item{cols}{Colors}
 
