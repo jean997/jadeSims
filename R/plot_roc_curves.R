@@ -47,7 +47,8 @@ plot_roc_curves <- function(agg.obj,
   ct <- ct+1
 
 
-  stat.cols <- which(agg.obj$names %in% c("bss.tstat", "spline.wt.ttests", " locfit.wt.ttests"))
+  stat.cols <- which(agg.obj$names %in% c("bss.tstat", "spline.wt.ttests", " locfit.wt.ttests",
+                                          "cfdr-pois", "cfdr-huber", "cfdr-tt"))
   #Plot the other methods
   for(j in 1:(length(agg.obj$names)-1)){
     if(!(agg.obj$names[j] %in% which.stats)) next
