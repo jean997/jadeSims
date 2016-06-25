@@ -22,5 +22,7 @@ avg_by_ct <- function(tpr.list, fct.list){
   m <- rowMeans(tpr.mat, na.rm=TRUE)
   tot.obs <- rowSums(!is.na(tpr.mat))
   var <- (1/(tot.obs-1))*rowSums((tpr.mat-m)^2, na.rm=TRUE)
-  return(list("fct"=pts, "tpr"=m, "s.e"=sqrt(var)))
+  R <- data.frame(cbind(pts, m, sqrt(var)))
+  names(R) <- c("fct", "tpr", "s.e")
+  return(R)
 }
