@@ -40,7 +40,7 @@ aggregate_sims <- function(file.prefix, profiles, which.alt, stat.thresh,
   p.cols <- which(which.alt %in% c("mk.agg.pval", "mk.ind.pval", "bss.pval",
                                    "spline.pvals", "locfit.pvals", "tt.pvals"))
 
-  for(j in 1:length(reps)){
+  for(j in 1:length(which.reps)){
     rep <- which.reps[j]
     jade.cv.file <- paste0("cv/", file.prefix , "_n", rep , "_cv.RData")
     orig.path.file <- paste0("path/", file.prefix, "_n", rep, "_path.0.RData")
