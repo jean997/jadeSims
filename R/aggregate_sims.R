@@ -61,7 +61,7 @@ aggregate_sims <- function(file.prefix, profiles, which.alt, stat.thresh,
       if(is.na(stat.thresh[i])) next
       my.labs <- rep(0, p)
       if((i %in% fdr.cols | i %in% p.cols) & any(stats[,ix[i]] <=0)){
-          cat("Failed: ", pnames[i], "\n")
+          cat("Failed: ", which.alt[i], "\n")
       }else{
         my.labs[abs(stats[, ix[i]]) < stat.thresh[i]] <- 1
       }
@@ -110,7 +110,7 @@ aggregate_sims <- function(file.prefix, profiles, which.alt, stat.thresh,
   avg.fpr <- colMeans(all.fpr, na.rm=TRUE)
   avg.region.tpr <- colMeans(all.region.tpr, na.rm=TRUE)
   avg.region.fct <- colMeans(all.region.fct, na.rm=TRUE)
-  names <- c(pnames, "jade")
+  names <- c(which.alt, "jade")
   R <- list("avg.tpr"=avg.tpr, "avg.fpr"=avg.fpr,
             "avg.region.tpr"=avg.region.tpr, "avg.region.fct"=avg.region.fct,
             "names"=names, "all.sep"=all.sep, "tol"=tol, "stat.thresh"=stat.thresh,
