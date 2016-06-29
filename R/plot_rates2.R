@@ -8,11 +8,11 @@
 #'@return Nothing
 #'@export
 plot_rates2 <- function(rate.list, cols, ltys, main="",
-                        lwd=1.5, make.legend=FALSE,
+                        lwd=1.5, make.legend=FALSE, nbars=5,
                         cex.axis=1, cex.lab=1.5, cex.main=2.5){
   N <- length(rate.list)-1
 
-  whichCI <- seq(1, length(rate.list[[1]]$fct), length.out=11)
+  whichCI <- seq(1, length(rate.list[[1]]$fct), length.out=nbars)
 
   m <- max(rate.list[[1]]$fct)
   for(i in 2:N) m <- max(m, rate.list[[i]]$fct)
