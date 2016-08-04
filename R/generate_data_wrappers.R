@@ -116,6 +116,43 @@ generate_data_long <- function(sig, rho, re, start.rep, stop.rep, sample.size=c(
   }
 }
 
+#'@title Wrapper to generate normal auto-regressive data with long profiles
+#'@description Generate normal AR  data. Run form a directory with a "data/" subdirectory.
+#'@export
+generate_data_long2 <- function(sig, rho, re, start.rep, stop.rep,
+                                file.prefix, bandwidth=20,
+                                sample.size=c(10, 10), seed=NULL){
+  if(!is.null(seed))set.seed(seed)
+  p <- dim(long_profiles3)[1]
+  K <- dim(long_profiles3)[2]
+  stopifnot(K==2)
+  stopifnot(length(sig)==length(sample.size))
+  labs <- rep(c(0, 1), sample.size)
+  for(rep in start.rep:stop.rep){
+    data.file <- paste0("data/", file.prefix, "_n", rep, "_data.RData")
+    y <- matrix(nrow=p, ncol=K)
+    full.data <- matrix(nrow=p, ncol=0)
+    for(i in 1:K){
+      my.y <- sapply(sig[[i]], FUN=function(s){
+          normal_data(long_profiles3[,i], s, rho, re)})
+      full.data <- cbind(full.data, my.y)
+    }
+
+    #dat.sm <- apply(full.data, MARGIN=2, FUN=function(y){
+    #  ksmooth(1:500, y, x.points = 1:500, bandwidth = bandwidth)$y
+    #})
+    #sm.tests <- cfdrSims:::t_stats(dat.sm, labs, s0=0)
+    #tests <- cfdrSims:::t_stats(full.data, labs=labs, s0=0)
+    #tests.sm <- ksmooth(1:500, tests, bandwidth=bandwidth, x.points=1:500)$y
+
+    R <- list("Y"=full.data, "sample.size"=sample.size)
+    save(R, file=data.file)
+    alternatives_normal(file.prefix = file.prefix)
+  }
+}
+
+
+
 
 #'@title Wrapper to generate normal data with short profiles
 #'@description Generate normal data. Run form a directory with a "data/" subdirectory.
