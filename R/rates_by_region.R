@@ -1,6 +1,6 @@
 
 rates_by_region <- function(x, labels,
-                            merge.margin=0, min.length=1, min.acc=0){
+                            merge.margin=0, min.length=1){
   labI <- Intervals(get_regions(labels, merge.margin=0, min.length=1), type="Z")
   xI <- Intervals(get_regions(x, merge.margin=merge.margin, min.length=min.length), type="Z")
 
@@ -25,11 +25,7 @@ rates_by_region <- function(x, labels,
       acc[j] <- sum(size(ixt))/size(xj)
     }
   }
-  if(min.acc > 0){
-    low.acc.ct <- sum(acc < min.acc & ov_X==0)
-    tp.ct <- tp.ct -low.acc.ct
-    fp.ct <- fp.ct + low.acc.ct
-  }
+
   xTP <- xI[ov_X==0 & acc >= min.acc,]
   ov_LTP <- distance_to_nearest(labI, xTP)
   disc <- rep(0, nrow(labI))
@@ -54,7 +50,7 @@ rates_by_region <- function(x, labels,
 #'@export
 get_region_rates <- function(agg.obj,
                             stat.names, max.prop=0.5,
-                             merge.margin=0, min.length=1, min.acc=0){
+                             merge.margin=0, min.length=1){
   #For each stat at each p-value level - p x length(which.stats) x 5
   #For jade at each level of gamma ngamma x 5
 
@@ -76,7 +72,7 @@ get_region_rates <- function(agg.obj,
   for(j in 1:N){
     cat(j, " ")
     jade.rates <-apply(agg.obj$all.sep[[j]], MARGIN=2, FUN=function(x){
-      jadeSims:::rates_by_region(x, labels, merge.margin, min.length, min.acc)
+      jadeSims:::rates_by_region(x, labels, merge.margin, min.length)
     })
     midx <- which(jade.rates["tot.disc",] <= max.prop)
     cat(length(midx), "\n")
@@ -103,10 +99,10 @@ get_region_rates <- function(agg.obj,
       q <- quantile(agg.obj$all.stats[j, , ix], probs=max.prop)
       sort.p <- sort(agg.obj$all.stats[j, ,ix])
       sort.p <- sort.p[sort.p <= q]
-      M <- sapply(sort.p, FUN=function(t, stats, sort.p){
+      M <- sapply(sort.p, FUN=function(t, stats){
         x <- stats < t
-        unlist(jadeSims:::rates_by_region(x, labels, merge.margin, min.length, min.acc))
-      }, stats=agg.obj$all.stats[j, , ix], sort.p=sort.p)
+        unlist(jadeSims:::rates_by_region(x, labels, merge.margin, min.length))
+      }, stats=agg.obj$all.stats[j, , ix])
       midx <- which(M["tot.disc",] <= max.prop)
       cat(length(midx), " ")
       tpr.list[[j]] <- M["tpr", midx]
